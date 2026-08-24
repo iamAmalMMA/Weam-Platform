@@ -11,15 +11,14 @@ The system supports multiple child conditions and support needs. It must not har
 5. Realtime communication layer
 6. AI Gateway
 7. RAG retrieval layer
-8. Care Coordination Agent with human approval
-9. Audit and permission enforcement
+8. Audit and permission enforcement
 
 ## Core permission rule
 Access is evaluated using:
 
 `role + child + guardian consent + resource permission + expiration`
 
-AI and agent tools must use the same permission boundary as the UI/API.
+AI features must use the same permission boundary as the UI/API.
 
 ## AI principle
 AI may summarize, extract, retrieve, compare, and suggest. Sensitive actions require explicit human approval.

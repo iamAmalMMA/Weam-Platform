@@ -3,6 +3,8 @@ import AppShell from './components/AppShell'
 import ProtectedRoute from './components/ProtectedRoute'
 import AiAssistantPage from './pages/AiAssistantPage'
 import CareTeamPage from './pages/CareTeamPage'
+import CenterDetailsPage from './pages/CenterDetailsPage'
+import CentersPage from './pages/CentersPage'
 import CommunicationHubPage from './pages/CommunicationHubPage'
 import ChildDetailPage from './pages/ChildDetailPage'
 import DashboardPage from './pages/DashboardPage'
@@ -31,6 +33,8 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/invitations" element={<InvitationsPage />} />
+          <Route path="/centers" element={<CentersPage />} />
+          <Route path="/centers/:centerId" element={<CenterDetailsPage />} />
           <Route path="/children/new" element={<NewChildPage />} />
           <Route path="/children/:childId" element={<ChildDetailPage />} />
           <Route path="/children/:childId/care-team" element={<CareTeamPage />} />

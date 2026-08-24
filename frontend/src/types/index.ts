@@ -321,3 +321,34 @@ export interface AssistantAnswer {
   user_message: AssistantMessage
   assistant_message: AssistantMessage
 }
+
+export interface Center {
+  id: string
+  name: string
+  description: string
+  city: string
+  region?: string | null
+  address: string
+  specialties: string[]
+  services: string[]
+  served_needs: string[]
+  min_age_years?: number | null
+  max_age_years?: number | null
+  offers_in_person: boolean
+  offers_remote: boolean
+  phone: string
+  email?: string | null
+  working_hours: string
+  price_range?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  is_favorite: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CenterFilterOptions {
+  cities: string[]
+  specialties: string[]
+  services: string[]
+}

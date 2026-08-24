@@ -46,13 +46,13 @@ See [`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md).
 4. Voice Updates
 5. Timeline + Goals
 6. AI Assistant + RAG
-7. Care Coordination Agent
-8. Realtime Communication
-9. Centers + Matching + Booking
-10. Calls + Notifications + Admin
+7. Follow-ups + Notifications
+8. Centers Directory + Matching
+9. Communication Upgrade
+10. Center Accounts + Administration + Final Polish
 
 ## Product rules
 - Supports multiple conditions and support needs from the start.
 - Hearing impairment is a demo/use-case, not a product limitation.
-- Guardian consent and least-privilege access apply to AI and future agent tools too.
+- Guardian consent and least-privilege access apply to AI features too.
 - Competition/demo environments use synthetic data only.
