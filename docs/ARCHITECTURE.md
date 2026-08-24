@@ -23,5 +23,8 @@ AI features must use the same permission boundary as the UI/API.
 ## AI principle
 AI may summarize, extract, retrieve, compare, and suggest. Sensitive actions require explicit human approval.
 
+## Center matching boundary
+Center matching is child-scoped and permission-aware. It uses only the care profile and the approved reports and active goals visible to the requesting user. A deterministic, explainable scorer ranks compatible active centers by recorded needs, age, optional city, and delivery preference. The existing Gemini layer may phrase the short grounded summary, but it cannot change the ranking or invent reasons; local fallback keeps the feature available. Matching runs are stored per requesting user for traceability and never claim that a center is medically “best.”
+
 ## Demo principle
 Competition/demo environments use synthetic data only.

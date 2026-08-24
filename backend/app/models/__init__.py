@@ -1,6 +1,7 @@
 from app.models.assistant import AssistantMessage, AssistantThread
 from app.models.care_team import AccessAuditLog, CareInvitation, CareTeamMembership
 from app.models.center import Center, CenterFavorite
+from app.models.center_match import CenterMatchRun
 from app.models.chat import ChatMessage, Conversation, ConversationParticipant
 from app.models.child import CareProfile, Child, ChildIdentity, GuardianMembership
 from app.models.follow_up import FollowUp, NotificationReceipt
@@ -19,6 +20,7 @@ __all__ = [
     "CareTeamMembership",
     "Center",
     "CenterFavorite",
+    "CenterMatchRun",
     "CareInvitation",
     "AccessAuditLog",
     "Report",

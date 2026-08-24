@@ -352,3 +352,44 @@ export interface CenterFilterOptions {
   specialties: string[]
   services: string[]
 }
+
+export type CenterMatchDeliveryMode = 'in_person' | 'remote' | 'both'
+
+export interface CenterMatchSource {
+  source_type: 'profile' | 'approved_report' | 'active_goal'
+  source_id: string
+  title: string
+  matched_signals: string[]
+}
+
+export interface CenterMatchItem {
+  rank: number
+  match_level: 'strong' | 'good' | 'initial'
+  center: Center
+  reasons: string[]
+  matched_signals: string[]
+  sources: CenterMatchSource[]
+}
+
+export interface CenterMatchEvidence {
+  profile_used: boolean
+  approved_reports_used: number
+  active_goals_used: number
+}
+
+export interface CenterMatchResult {
+  id: string
+  child_id: string
+  child_name: string
+  child_age_years?: number | null
+  preferred_city?: string | null
+  delivery_mode?: CenterMatchDeliveryMode | null
+  summary: string
+  profile_signals: string[]
+  evidence: CenterMatchEvidence
+  insufficient_data: boolean
+  limitations: string[]
+  safety_note: string
+  matches: CenterMatchItem[]
+  created_at: string
+}

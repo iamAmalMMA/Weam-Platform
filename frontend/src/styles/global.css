@@ -212,7 +212,7 @@ textarea { resize: vertical; }
 .child-hero-avatar { position: relative; z-index: 2; width: 150px; height: 150px; border-radius: 46% 54% 52% 48%; background: linear-gradient(155deg, #75c8bf, #1b9da0); display: grid; place-items: center; color: white; box-shadow: 0 18px 45px rgba(39,150,151,.19); flex: 0 0 auto; }
 .child-hero-avatar span { font-size: 54px; font-weight: 900; }
 .child-hero-avatar small { position: absolute; bottom: 18px; font-size: 10px; opacity: .82; }
-.dashboard-shortcuts { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; background: #fff; border: 1px solid #e2efec; border-radius: 24px; padding: 14px; box-shadow: var(--soft-shadow); }
+.dashboard-shortcuts { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; background: #fff; border: 1px solid #e2efec; border-radius: 24px; padding: 14px; box-shadow: var(--soft-shadow); }
 .dashboard-shortcuts > div { border-radius: 18px; padding: 14px 12px; display: grid; justify-items: center; gap: 6px; text-align: center; }
 .dashboard-shortcuts strong { font-size: 14px; }
 .dashboard-shortcuts small { color: #9aa5a9; font-size: 10px; }
@@ -370,7 +370,8 @@ textarea { resize: vertical; }
   .prototype-child-hero { min-height: 240px; padding: 24px 20px; }
   .child-hero-avatar { width: 92px; height: 92px; }
   .child-hero-avatar span { font-size: 34px; }
-  .dashboard-shortcuts, .profile-shortcuts { grid-template-columns: repeat(4,1fr); gap: 6px; padding: 8px; }
+  .dashboard-shortcuts { grid-template-columns: repeat(3,1fr); gap: 6px; padding: 8px; }
+  .profile-shortcuts { grid-template-columns: repeat(4,1fr); gap: 6px; padding: 8px; }
   .dashboard-shortcuts > div, .profile-shortcuts > div { padding: 10px 4px; }
   .dashboard-shortcuts strong, .profile-shortcuts strong { font-size: 11px; }
   .shortcut-icon, .profile-shortcuts > div > span { width: 38px; height: 38px; border-radius: 12px; font-size: 17px; }

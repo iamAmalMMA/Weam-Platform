@@ -5,6 +5,7 @@ import AiAssistantPage from './pages/AiAssistantPage'
 import CareTeamPage from './pages/CareTeamPage'
 import CenterDetailsPage from './pages/CenterDetailsPage'
 import CentersPage from './pages/CentersPage'
+import CenterMatchingPage from './pages/CenterMatchingPage'
 import CommunicationHubPage from './pages/CommunicationHubPage'
 import ChildDetailPage from './pages/ChildDetailPage'
 import DashboardPage from './pages/DashboardPage'
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/children/:childId/voice-notes" element={<VoiceNotesPage />} />
           <Route path="/children/:childId/communication" element={<CommunicationHubPage />} />
           <Route path="/children/:childId/assistant" element={<AiAssistantPage />} />
+          <Route path="/children/:childId/center-matches" element={<CenterMatchingPage />} />
           <Route path="/reports/:reportId/ai" element={<ReportAIPage />} />
         </Route>
       </Route>

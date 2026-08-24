@@ -104,6 +104,7 @@ export default function DashboardPage() {
             <Link to={`/children/${selectedChild.id}/timeline`} className="dashboard-shortcut-link"><span className="shortcut-icon appointment">↻</span><strong>الخط الزمني</strong><small>رحلة الطفل كاملة</small></Link>
             <Link to={`/children/${selectedChild.id}/goals`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">◎</span><strong>الأهداف</strong><small>الخطة والتقدم</small></Link>
             <Link to={`/children/${selectedChild.id}/care-team`} className="dashboard-shortcut-link"><span className="shortcut-icon note">♧</span><strong>فريق الرعاية</strong><small>إدارة الوصول</small></Link>
+            <Link to={`/children/${selectedChild.id}/center-matches`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">✦</span><strong>مراكز مناسبة</strong><small>حسب احتياجات الملف</small></Link>
           </div>
 
           <div className="quick-glance-card">
