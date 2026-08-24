@@ -84,6 +84,7 @@ def _serialize_run(db: Session, run: CenterMatchRun, user: User) -> CenterMatchR
         select(Center).where(
             Center.id.in_(center_ids),
             Center.is_active.is_(True),
+            Center.verification_status == "verified",
         )
     ).all() if center_ids else []
     center_by_id = {center.id: center for center in centers}
@@ -167,7 +168,10 @@ def create_center_match(
     centers = list(
         db.scalars(
             select(Center)
-            .where(Center.is_active.is_(True))
+            .where(
+                Center.is_active.is_(True),
+                Center.verification_status == "verified",
+            )
             .order_by(Center.name.asc())
         ).all()
     )

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import type { CareTeamOverview, ChildProfile, ChildReport, ReportVersion } from '../types'
@@ -25,6 +25,8 @@ function fileIcon(contentType?: string) {
 
 export default function ReportsPage() {
   const { childId } = useParams()
+  const [searchParams] = useSearchParams()
+  const sharedReportId = searchParams.get('report')
   const { user } = useAuth()
   const [child, setChild] = useState<ChildProfile | null>(null)
   const [reports, setReports] = useState<ChildReport[]>([])
@@ -78,6 +80,14 @@ export default function ReportsPage() {
     void load()
     return () => { active = false }
   }, [childId])
+
+  useEffect(() => {
+    if (!sharedReportId || !reports.some((report) => report.id === sharedReportId)) return
+    const timer = window.setTimeout(() => {
+      document.getElementById(`report-${sharedReportId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 120)
+    return () => window.clearTimeout(timer)
+  }, [reports, sharedReportId])
 
   const selectableMembers = useMemo(
     () => (team?.members ?? []).filter((member) => member.access_status === 'active' && member.user_id !== user?.id),
@@ -239,7 +249,11 @@ export default function ReportsPage() {
             const latest = report.versions[0]
             const historyVisible = historyOpen === report.id
             return (
-              <article className="report-card" key={report.id}>
+              <article
+                id={`report-${report.id}`}
+                className={`report-card ${sharedReportId === report.id ? 'shared-target-highlight' : ''}`}
+                key={report.id}
+              >
                 <div className="report-card-main">
                   <div className="report-file-icon">{fileIcon(latest?.content_type)}</div>
                   <div className="report-card-copy">

@@ -131,6 +131,11 @@ def google_auth(payload: GoogleAuthRequest, db: Session = Depends(get_db)) -> Au
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="role is required for first Google sign-in",
                 )
+            if payload.role == UserRole.ADMIN:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Admin accounts cannot be created through public registration",
+                )
             if payload.role == UserRole.CARE_PROVIDER and not payload.provider_specialty:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

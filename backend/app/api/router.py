@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.routes.assistant import router as assistant_router
+from app.api.routes.admin import router as admin_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.care_team import router as care_team_router
 from app.api.routes.centers import router as centers_router
@@ -11,6 +12,7 @@ from app.api.routes.follow_ups import router as follow_ups_router
 from app.api.routes.goals import router as goals_router
 from app.api.routes.health import router as health_router
 from app.api.routes.notifications import router as notifications_router
+from app.api.routes.provider import router as provider_router
 from app.api.routes.report_ai import router as report_ai_router
 from app.api.routes.reports import router as reports_router
 from app.api.routes.timeline import router as timeline_router
@@ -19,6 +21,8 @@ from app.api.routes.voice_notes import router as voice_notes_router
 api_router = APIRouter()
 api_router.include_router(health_router)
 api_router.include_router(auth_router)
+api_router.include_router(admin_router)
+api_router.include_router(provider_router)
 api_router.include_router(children_router)
 api_router.include_router(care_team_router)
 api_router.include_router(centers_router)

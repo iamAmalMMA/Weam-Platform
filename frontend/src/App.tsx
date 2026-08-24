@@ -2,10 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import AppShell from './components/AppShell'
 import ProtectedRoute from './components/ProtectedRoute'
 import AiAssistantPage from './pages/AiAssistantPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 import CareTeamPage from './pages/CareTeamPage'
 import CenterDetailsPage from './pages/CenterDetailsPage'
 import CentersPage from './pages/CentersPage'
 import CenterMatchingPage from './pages/CenterMatchingPage'
+import CenterManagementPage from './pages/CenterManagementPage'
 import CommunicationHubPage from './pages/CommunicationHubPage'
 import ChildDetailPage from './pages/ChildDetailPage'
 import DashboardPage from './pages/DashboardPage'
@@ -14,8 +16,10 @@ import GoalsPage from './pages/GoalsPage'
 import HomePage from './pages/HomePage'
 import InvitationsPage from './pages/InvitationsPage'
 import LoginPage from './pages/LoginPage'
+import MessagesInboxPage from './pages/MessagesInboxPage'
 import NewChildPage from './pages/NewChildPage'
 import NotificationsPage from './pages/NotificationsPage'
+import ProviderDashboardPage from './pages/ProviderDashboardPage'
 import RegisterPage from './pages/RegisterPage'
 import ReportAIPage from './pages/ReportAIPage'
 import ReportsPage from './pages/ReportsPage'
@@ -33,7 +37,11 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/provider" element={<ProviderDashboardPage />} />
+          <Route path="/provider/center" element={<CenterManagementPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/invitations" element={<InvitationsPage />} />
+          <Route path="/messages" element={<MessagesInboxPage />} />
           <Route path="/centers" element={<CentersPage />} />
           <Route path="/centers/:centerId" element={<CenterDetailsPage />} />
           <Route path="/children/new" element={<NewChildPage />} />

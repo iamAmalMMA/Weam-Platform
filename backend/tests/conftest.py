@@ -16,6 +16,7 @@ os.environ["WEAM_CREATE_TABLES_ON_STARTUP"] = "false"
 os.environ["WEAM_STORAGE_ROOT"] = TEST_STORAGE.as_posix()
 os.environ["WEAM_MAX_REPORT_UPLOAD_MB"] = "2"
 os.environ["WEAM_MAX_VOICE_UPLOAD_MB"] = "2"
+os.environ["WEAM_MAX_CHAT_ATTACHMENT_MB"] = "2"
 os.environ["WEAM_AI_PROVIDER"] = "mock"
 os.environ["WEAM_STT_PROVIDER"] = "mock"
 

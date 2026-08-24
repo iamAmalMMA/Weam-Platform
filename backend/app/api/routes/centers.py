@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.center import Center, CenterFavorite
+from app.models.center_account import CenterSpecialist
 from app.models.user import User
 from app.schemas.center import CenterFilterOptions, CenterPublic
 
@@ -29,7 +30,7 @@ def _normalize(value: str) -> str:
 
 def _center_or_404(db: Session, center_id: str) -> Center:
     center = db.get(Center, center_id)
-    if not center or not center.is_active:
+    if not center or not center.is_active or center.verification_status != "verified":
         raise HTTPException(status_code=404, detail="Center not found")
     return center
 
@@ -42,7 +43,11 @@ def _favorite_center_ids(db: Session, user_id: str) -> set[str]:
     )
 
 
-def _serialize(center: Center, favorite_ids: set[str]) -> CenterPublic:
+def _serialize(
+    center: Center,
+    favorite_ids: set[str],
+    specialists: list[CenterSpecialist] | None = None,
+) -> CenterPublic:
     return CenterPublic(
         id=center.id,
         name=center.name,
@@ -63,6 +68,7 @@ def _serialize(center: Center, favorite_ids: set[str]) -> CenterPublic:
         price_range=center.price_range,
         latitude=center.latitude,
         longitude=center.longitude,
+        specialists=list(specialists or []),
         is_favorite=center.id in favorite_ids,
         created_at=center.created_at,
         updated_at=center.updated_at,
@@ -91,7 +97,10 @@ def get_center_filter_options(
     _: User = Depends(get_current_user),
 ) -> CenterFilterOptions:
     centers = db.scalars(
-        select(Center).where(Center.is_active.is_(True))
+        select(Center).where(
+            Center.is_active.is_(True),
+            Center.verification_status == "verified",
+        )
     ).all()
     return CenterFilterOptions(
         cities=sorted({center.city for center in centers}),
@@ -119,7 +128,10 @@ def list_centers(
     centers = list(
         db.scalars(
             select(Center)
-            .where(Center.is_active.is_(True))
+            .where(
+                Center.is_active.is_(True),
+                Center.verification_status == "verified",
+            )
             .order_by(Center.name.asc())
         ).all()
     )
@@ -180,7 +192,17 @@ def get_center(
     user: User = Depends(get_current_user),
 ) -> CenterPublic:
     center = _center_or_404(db, center_id)
-    return _serialize(center, _favorite_center_ids(db, user.id))
+    specialists = list(
+        db.scalars(
+            select(CenterSpecialist)
+            .where(
+                CenterSpecialist.center_id == center.id,
+                CenterSpecialist.is_active.is_(True),
+            )
+            .order_by(CenterSpecialist.full_name.asc())
+        ).all()
+    )
+    return _serialize(center, _favorite_center_ids(db, user.id), specialists)
 
 
 @router.put("/{center_id}/favorite", response_model=CenterPublic)

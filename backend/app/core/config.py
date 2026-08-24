@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     storage_root: str = ".weam_storage"
     max_report_upload_mb: int = 15
     max_voice_upload_mb: int = 25
+    max_chat_attachment_mb: int = 10
 
     ai_provider: str = "mock"
     ai_api_key: str | None = None

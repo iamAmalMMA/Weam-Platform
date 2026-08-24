@@ -26,5 +26,14 @@ AI may summarize, extract, retrieve, compare, and suggest. Sensitive actions req
 ## Center matching boundary
 Center matching is child-scoped and permission-aware. It uses only the care profile and the approved reports and active goals visible to the requesting user. A deterministic, explainable scorer ranks compatible active centers by recorded needs, age, optional city, and delivery preference. The existing Gemini layer may phrase the short grounded summary, but it cannot change the ranking or invent reasons; local fallback keeps the feature available. Matching runs are stored per requesting user for traceability and never claim that a center is medically “best.”
 
+## Communication boundary
+Conversations remain child-scoped and require an active care-team membership with messaging permission. Read receipts are per user. Attachments are signature-validated, stored privately, and downloaded only after conversation and child-access checks. Sharing a report, goal, or follow-up does not bypass that resource's own view permission.
+
+## Center account boundary
+A center account owns a directory profile through `CenterAccountMembership` and may manage its services and specialists. It receives no child access from that ownership. A child appears to a center only after a guardian invitation is accepted, with explicit permissions and an optional expiration.
+
+## Administration boundary
+Admin accounts are provisioned through a server-side command, never public registration. The admin API manages account/center review, activation, aggregate counts, and a dedicated administrative audit trail. It intentionally exposes no report contents, diagnoses, goals, voice notes, conversations, or other clinical records.
+
 ## Demo principle
 Competition/demo environments use synthetic data only.

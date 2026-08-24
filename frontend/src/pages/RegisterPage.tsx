@@ -9,7 +9,7 @@ import type { UserRole } from '../types'
 const roles: Array<{ value: UserRole; title: string; copy: string; icon: string }> = [
   { value: 'guardian', title: 'ولي أمر', copy: 'إدارة ملفات الأطفال وفريق الرعاية', icon: '♡' },
   { value: 'care_provider', title: 'مقدم رعاية', copy: 'طبيب، أخصائي، معلم أو مقدم دعم', icon: '✦' },
-  { value: 'center', title: 'مركز', copy: 'إدارة خدمات المركز وطلبات الأسر', icon: '⌂' },
+  { value: 'center', title: 'مركز', copy: 'إدارة ملف المركز وخدماته ومختصيه', icon: '⌂' },
 ]
 
 function errorMessage(error: unknown) {
@@ -40,7 +40,7 @@ export default function RegisterPage() {
     setError('')
     try {
       await register({ email, full_name: fullName, password, role, provider_specialty: role === 'care_provider' ? specialty : undefined })
-      navigate(role === 'guardian' ? '/children/new' : '/dashboard', { replace: true })
+      navigate(role === 'guardian' ? '/children/new' : '/provider', { replace: true })
     } catch (err) {
       setError(errorMessage(err))
     } finally {
@@ -52,7 +52,7 @@ export default function RegisterPage() {
     setError('')
     try {
       await loginWithGoogleCredential(credential, role, role === 'care_provider' ? specialty : undefined)
-      navigate(role === 'guardian' ? '/children/new' : '/dashboard', { replace: true })
+      navigate(role === 'guardian' ? '/children/new' : '/provider', { replace: true })
     } catch (err) {
       setError(errorMessage(err))
     }

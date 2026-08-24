@@ -30,7 +30,7 @@ export interface ChildProfile {
   services: string[]
   summary?: string | null
   guardian_type?: 'primary' | 'secondary' | null
-  access_role: 'guardian' | 'care_provider'
+  access_role: 'guardian' | 'care_provider' | 'center'
   access_permissions: string[]
   created_at: string
   updated_at: string
@@ -53,7 +53,7 @@ export interface CareInvitation {
   child_id: string
   child_name: string
   email: string
-  target_role: 'guardian' | 'care_provider'
+  target_role: 'guardian' | 'care_provider' | 'center'
   role_label?: string | null
   permissions: string[]
   status: string
@@ -276,7 +276,35 @@ export interface ChatMessage {
   sender_user_id: string
   sender_name: string
   body: string
+  message_type: 'text' | 'attachment' | 'shared'
+  attachments: ChatAttachment[]
+  shared_item?: SharedChatItem | null
+  is_read: boolean
+  read_by_count: number
+  is_read_by_everyone: boolean
   created_at: string
+}
+
+export interface ChatAttachment {
+  id: string
+  original_filename: string
+  content_type: string
+  size_bytes: number
+  download_url: string
+}
+
+export interface SharedChatItem {
+  entity_type: 'report' | 'goal' | 'follow_up'
+  entity_id: string
+  title: string
+  url: string
+}
+
+export interface ShareableItem {
+  entity_type: 'report' | 'goal' | 'follow_up'
+  entity_id: string
+  title: string
+  subtitle?: string | null
 }
 
 export interface CareConversation {
@@ -286,6 +314,7 @@ export interface CareConversation {
   title: string
   participants: ConversationParticipant[]
   last_message?: ChatMessage | null
+  unread_count: number
   created_at: string
   updated_at: string
 }
@@ -342,9 +371,18 @@ export interface Center {
   price_range?: string | null
   latitude?: number | null
   longitude?: number | null
+  specialists: CenterSpecialistSummary[]
   is_favorite: boolean
   created_at: string
   updated_at: string
+}
+
+export interface CenterSpecialistSummary {
+  id: string
+  full_name: string
+  professional_title: string
+  specialty: string
+  bio?: string | null
 }
 
 export interface CenterFilterOptions {
@@ -391,5 +429,97 @@ export interface CenterMatchResult {
   limitations: string[]
   safety_note: string
   matches: CenterMatchItem[]
+  created_at: string
+}
+
+export interface ManagedCenter {
+  id: string
+  name: string
+  description: string
+  city: string
+  region?: string | null
+  address: string
+  specialties: string[]
+  services: string[]
+  served_needs: string[]
+  min_age_years?: number | null
+  max_age_years?: number | null
+  offers_in_person: boolean
+  offers_remote: boolean
+  phone: string
+  email?: string | null
+  working_hours: string
+  price_range?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  is_active: boolean
+  verification_status: 'verified' | 'unverified' | 'rejected'
+  verification_note?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CenterSpecialist {
+  id: string
+  center_id: string
+  full_name: string
+  professional_title: string
+  specialty: string
+  bio?: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ProviderDashboard {
+  center?: ManagedCenter | null
+  specialists_count: number
+  authorized_children_count: number
+  account_kind: 'care_provider' | 'center'
+}
+
+export interface AdminSummary {
+  users_total: number
+  users_active: number
+  pending_accounts: number
+  centers_total: number
+  centers_active: number
+  pending_centers: number
+  child_profiles_total: number
+}
+
+export interface AdminUser {
+  id: string
+  email: string
+  full_name: string
+  role: UserRole
+  provider_specialty?: string | null
+  verification_status: 'verified' | 'unverified' | 'rejected'
+  verification_note?: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export interface AdminCenter {
+  id: string
+  name: string
+  city: string
+  verification_status: 'verified' | 'unverified' | 'rejected'
+  verification_note?: string | null
+  is_active: boolean
+  account_count: number
+  account_email?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminAuditItem {
+  id: string
+  actor_user_id: string
+  actor_name: string
+  action: string
+  entity_type: string
+  entity_id?: string | null
+  details: Record<string, unknown>
   created_at: string
 }

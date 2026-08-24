@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import type { ChildProfile } from '../types'
@@ -26,6 +26,9 @@ export default function DashboardPage() {
 
   const selectedChild = useMemo(() => children.find((child) => child.id === selectedChildId) ?? children[0], [children, selectedChildId])
 
+  if (user?.role === 'center') return <Navigate to="/provider" replace />
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />
+
   if (!canAccessChildren) {
     return (
       <section className="provider-dashboard">
@@ -45,7 +48,7 @@ export default function DashboardPage() {
         {error && <div className="alert alert-error">{error}</div>}
         <div className="soft-dashboard-banner">
           <div><span className="soft-kicker">مرحبًا {user.full_name}</span><h1>فريق الرعاية في مساحة واحدة</h1><p>تظهر هنا فقط ملفات الأطفال التي قُبلت دعوتك للوصول إليها وضمن الصلاحيات المحددة لك.</p></div>
-          <Link className="btn btn-primary" to="/invitations">عرض الدعوات</Link>
+          <div className="dashboard-banner-actions"><Link className="btn btn-outline" to="/invitations">عرض الدعوات</Link><Link className="btn btn-primary" to="/provider">مساحة مقدم الخدمة</Link></div>
         </div>
         {children.length ? (
           <div className="provider-child-grid">
