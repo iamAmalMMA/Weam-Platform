@@ -4,6 +4,7 @@ from app.api.routes.assistant import router as assistant_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.care_team import router as care_team_router
 from app.api.routes.centers import router as centers_router
+from app.api.routes.center_matching import router as center_matching_router
 from app.api.routes.chat import router as chat_router
 from app.api.routes.children import router as children_router
 from app.api.routes.follow_ups import router as follow_ups_router
@@ -21,6 +22,7 @@ api_router.include_router(auth_router)
 api_router.include_router(children_router)
 api_router.include_router(care_team_router)
 api_router.include_router(centers_router)
+api_router.include_router(center_matching_router)
 api_router.include_router(reports_router)
 api_router.include_router(report_ai_router)
 api_router.include_router(goals_router)

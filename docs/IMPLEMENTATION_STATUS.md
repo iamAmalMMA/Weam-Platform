@@ -1,5 +1,29 @@
 # Weam implementation status
 
+## Implemented — M5: AI Center Matching (verification pending)
+
+### Backend
+- Child-scoped matching endpoint and latest-result endpoint
+- Matching over authorized profile data, approved report analyses, and active goals
+- Age, city, and in-person/remote constraints
+- Explainable top-three ranking with source attribution
+- Stored per-user matching runs and access audit records
+- Gemini summary through the existing AI layer with a grounded local fallback
+- Migration `0011_ai_center_matching`
+
+### Frontend
+- Arabic RTL center-matching page under each child profile
+- Optional city and delivery preferences
+- Clear reasons, authorized source labels, limitations, loading, empty, and error states
+- Responsive cards and direct navigation to center details
+- Safety wording that avoids medical endorsement or “best center” claims
+
+### Verification
+- Automated M5 backend tests cover ranking, permissions, source approval, age/city/mode constraints, latest results, and insufficient data.
+- Run Backend tests, TypeScript typecheck, Frontend build, and responsive manual review before closing the milestone.
+
+---
+
 ## Completed — Feature 01: Authentication + Child Profile
 
 ### Backend
@@ -33,5 +57,3 @@
 - Python compile check: passing
 - Frontend build must be run on a machine where npm dependencies can be installed (package network access is unavailable in the build sandbox used to prepare this package).
 
-## Next feature
-Care Team + Invitations + Consent + Permissions + Access Expiration/Revoke.
