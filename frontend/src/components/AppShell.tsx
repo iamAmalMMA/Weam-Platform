@@ -48,6 +48,7 @@ export default function AppShell() {
 
         <nav className="prototype-main-nav" aria-label="التنقل الرئيسي">
           <NavLink to="/dashboard">الرئيسية</NavLink>
+          <NavLink to="/centers">المراكز والخدمات</NavLink>
           <NavLink to="/invitations">الدعوات</NavLink>
           <NavLink to="/notifications" className="notification-nav-link">
             التنبيهات
@@ -79,7 +80,7 @@ export default function AppShell() {
           <span>🔔{unread > 0 && <b>{unread > 9 ? '9+' : unread}</b>}</span>
           <small>التنبيهات</small>
         </NavLink>
-        <button type="button" onClick={signOut}><span>•••</span><small>المزيد</small></button>
+        <NavLink to="/centers"><span>⌖</span><small>المراكز</small></NavLink>
       </nav>
     </div>
   )

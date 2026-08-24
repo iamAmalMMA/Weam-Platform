@@ -13,9 +13,9 @@ This implementation is intentionally local-first and free:
 
 The current answer generator is deterministic grounded retrieval, not a general
 LLM. This is deliberate for the MVP: it produces auditable answers and creates
-the exact retrieval/source layer needed by the next Care Coordination Agent.
-A local LLM can be layered on top later without changing the data-permission
-or source pipeline.
+a reusable retrieval/source layer for later grounded features. The answer
+generation layer can evolve later without changing the data-permission or
+source pipeline.
 
 Migration:
 python -m alembic upgrade head
