@@ -36,8 +36,8 @@ export default function ProviderDashboardPage() {
   return (
     <section className="provider-portal-page">
       <div className="provider-portal-hero">
-        <div><span className="soft-kicker">مساحة مقدم الخدمة</span><h1>مرحبًا {user?.full_name}</h1><p>إدارة واضحة لبيانات الجهة والملفات التي منحك أصحابها صلاحية الوصول إليها.</p></div>
-        <Link className="btn btn-white" to="/invitations">عرض الدعوات</Link>
+        <div><span className="soft-kicker">مساحة مقدم الخدمة</span><h1>مرحبًا {user?.full_name}</h1><p>إدارة ملف الجهة والفريق والوصول المصرح به من مساحة واحدة واضحة.</p></div>
+        <Link className="btn btn-white btn-small" to="/invitations">عرض الدعوات</Link>
       </div>
       {error && <div className="alert alert-error">{error}</div>}
 
@@ -46,9 +46,8 @@ export default function ProviderDashboardPage() {
           <div className="provider-setup-card"><span>⌂</span><div><h2>استكمال ملف المركز</h2><p>إضافة الخدمات والتخصصات ومعلومات التواصل، ثم إرسال الملف للمراجعة.</p></div><Link className="btn btn-primary" to="/provider/center">إنشاء ملف المركز</Link></div>
         ) : (
           <div className="provider-center-overview">
-            <div><span className={`status-pill ${dashboard.center.verification_status === 'verified' ? 'success' : 'warning'}`}>{verificationLabels[dashboard.center.verification_status]}</span><h2>{dashboard.center.name}</h2><p>{dashboard.center.city} · {dashboard.center.services.slice(0, 3).join('، ') || 'لم تُضف خدمات بعد'}</p></div>
+            <div className="provider-center-copy"><div className="provider-center-title-row"><span className={`status-pill ${dashboard.center.verification_status === 'verified' ? 'success' : 'warning'}`}>{verificationLabels[dashboard.center.verification_status]}</span><Link className="provider-compact-edit" to="/provider/center">تعديل الملف</Link></div><h2>{dashboard.center.name}</h2><p>{dashboard.center.city} · {dashboard.center.services.slice(0, 3).join('، ') || 'لم تُضف خدمات بعد'}</p></div>
             <div className="provider-overview-stats"><article><strong>{dashboard.specialists_count}</strong><span>مختصون</span></article><article><strong>{dashboard.authorized_children_count}</strong><span>ملفات مصرح بها</span></article></div>
-            <Link className="btn btn-outline" to="/provider/center">إدارة ملف المركز</Link>
           </div>
         )
       )}

@@ -83,6 +83,11 @@ export default function DashboardPage() {
     <section className="guardian-dashboard">
       {error && <div className="alert alert-error">{error}</div>}
 
+      <div className="m9-dashboard-heading">
+        <div><span className="soft-kicker">مساحة العائلة</span><h1>صباح الخير، {user?.full_name}</h1><p>تابعي رحلة الرعاية، واصلي إلى أهم المهام، واحتفظي بكل تفاصيل الطفل في مكان واحد.</p></div>
+        <Link className="btn btn-primary" to="/children/new">＋ إضافة طفل</Link>
+      </div>
+
       {children.length > 1 && (
         <div className="child-switcher" aria-label="اختيار الطفل">
           {children.map((child) => <button key={child.id} className={selectedChild?.id === child.id ? 'active' : ''} onClick={() => setSelectedChildId(child.id)}>{child.preferred_name || child.first_name}</button>)}
@@ -92,14 +97,17 @@ export default function DashboardPage() {
 
       {selectedChild && (
         <>
-          <div className="prototype-child-hero">
+          <div className="prototype-child-hero m9-child-hero">
             <div className="child-hero-copy">
-              <span className="soft-kicker">مرحبًا،</span>
-              <h1>هذه {selectedChild.preferred_name || selectedChild.first_name} 💛</h1>
+              <span className="soft-kicker">ملف الرعاية الحالي</span>
+              <h1>{selectedChild.preferred_name || selectedChild.first_name}</h1>
               <p>{selectedChild.summary || 'كل يوم خطوة جديدة نحو تطوير طفلك وتمكينه.'}</p>
               <Link className="profile-link" to={`/children/${selectedChild.id}`}>عرض الملف الشخصي ←</Link>
             </div>
-            <div className="child-hero-avatar"><span>{selectedChild.first_name.slice(0, 1)}</span><small>ملف الرعاية</small></div>
+            <Link className="m9-child-identity" to={`/children/${selectedChild.id}`}>
+              <span className="m9-child-avatar">{selectedChild.first_name.slice(0, 1)}</span>
+              <div><small>ملف الطفل</small><strong>{selectedChild.preferred_name || selectedChild.first_name}</strong><span>{selectedChild.services[0] || selectedChild.needs[0] || 'رحلة رعاية متكاملة'}</span></div>
+            </Link>
           </div>
 
           <div className="dashboard-shortcuts">
