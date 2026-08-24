@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ConversationCreate(BaseModel):
@@ -31,15 +31,49 @@ class ConversationParticipantPublic(BaseModel):
 
 
 class MessageCreate(BaseModel):
-    body: str = Field(min_length=1, max_length=4000)
+    body: str | None = Field(default=None, max_length=4000)
+    shared_entity_type: Literal["report", "goal", "follow_up"] | None = None
+    shared_entity_id: str | None = Field(default=None, max_length=36)
 
     @field_validator("body")
     @classmethod
-    def clean_body(cls, value: str) -> str:
+    def clean_body(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
         cleaned = value.strip()
-        if not cleaned:
+        return cleaned or None
+
+    @model_validator(mode="after")
+    def require_content(self):
+        if self.shared_entity_type and not self.shared_entity_id:
+            raise ValueError("shared_entity_id is required")
+        if self.shared_entity_id and not self.shared_entity_type:
+            raise ValueError("shared_entity_type is required")
+        if not self.body and not self.shared_entity_type:
             raise ValueError("Message cannot be empty")
-        return cleaned
+        return self
+
+
+class ChatAttachmentPublic(BaseModel):
+    id: str
+    original_filename: str
+    content_type: str
+    size_bytes: int
+    download_url: str
+
+
+class SharedItemPublic(BaseModel):
+    entity_type: Literal["report", "goal", "follow_up"]
+    entity_id: str
+    title: str
+    url: str
+
+
+class ShareableItemPublic(BaseModel):
+    entity_type: Literal["report", "goal", "follow_up"]
+    entity_id: str
+    title: str
+    subtitle: str | None = None
 
 
 class ChatMessagePublic(BaseModel):
@@ -48,6 +82,12 @@ class ChatMessagePublic(BaseModel):
     sender_user_id: str
     sender_name: str
     body: str
+    message_type: Literal["text", "attachment", "shared"]
+    attachments: list[ChatAttachmentPublic]
+    shared_item: SharedItemPublic | None
+    is_read: bool
+    read_by_count: int
+    is_read_by_everyone: bool
     created_at: datetime
 
 
@@ -58,5 +98,16 @@ class ConversationPublic(BaseModel):
     title: str
     participants: list[ConversationParticipantPublic]
     last_message: ChatMessagePublic | None
+    unread_count: int
     created_at: datetime
     updated_at: datetime
+
+
+class ChatUnreadCountPublic(BaseModel):
+    count: int
+
+
+class MarkConversationReadPublic(BaseModel):
+    conversation_id: str
+    marked_count: int
+    unread_count: int = 0

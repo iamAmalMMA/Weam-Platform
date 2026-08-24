@@ -213,3 +213,64 @@ class LocalVoiceStorage(_LocalStorageBase):
             if temporary.exists():
                 temporary.unlink()
             raise
+
+
+class LocalChatStorage(_LocalStorageBase):
+    """Private chat attachment storage with the same validated file boundary."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.max_bytes = get_settings().max_chat_attachment_mb * 1024 * 1024
+
+    def save_upload(
+        self,
+        upload: UploadFile,
+        *,
+        conversation_id: str,
+        attachment_id: str,
+    ) -> StoredFile:
+        content_type = (upload.content_type or "").lower().split(";", 1)[0].strip()
+        if content_type not in REPORT_ALLOWED_TYPES:
+            raise StorageValidationError("Only PDF, PNG and JPEG attachments are supported")
+
+        suffix, signature = REPORT_ALLOWED_TYPES[content_type]
+        key = f"chat/{conversation_id}/{attachment_id}{suffix}"
+        destination = self._safe_path(key)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        temporary = destination.with_suffix(destination.suffix + ".tmp")
+
+        size = 0
+        digest = hashlib.sha256()
+        first_bytes = b""
+        try:
+            with temporary.open("wb") as handle:
+                while True:
+                    chunk = upload.file.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    if not first_bytes:
+                        first_bytes = chunk[:16]
+                    size += len(chunk)
+                    if size > self.max_bytes:
+                        raise StorageValidationError(
+                            f"Attachment is too large. Maximum size is {get_settings().max_chat_attachment_mb} MB"
+                        )
+                    digest.update(chunk)
+                    handle.write(chunk)
+
+            if size == 0:
+                raise StorageValidationError("Uploaded attachment is empty")
+            if not first_bytes.startswith(signature):
+                raise StorageValidationError("Attachment content does not match its declared type")
+
+            temporary.replace(destination)
+            return StoredFile(
+                key=key,
+                size_bytes=size,
+                sha256=digest.hexdigest(),
+                content_type=content_type,
+            )
+        except Exception:
+            if temporary.exists():
+                temporary.unlink()
+            raise

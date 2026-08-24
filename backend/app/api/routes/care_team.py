@@ -129,7 +129,9 @@ def _serialize_member(db: Session, membership: CareTeamMembership) -> MemberPubl
         full_name=user.full_name,
         email=user.email,
         account_role=user.role,
-        role_label=membership.role_label or user.provider_specialty,
+        role_label=membership.role_label or user.provider_specialty or (
+            "ممثل المركز" if user.role == UserRole.CENTER.value else "مقدم رعاية"
+        ),
         verification_status=user.verification_status,
         guardian_type=None,
         permissions=list(membership.permissions or []),
@@ -197,10 +199,10 @@ def create_invitation(
     user: User = Depends(get_current_user),
 ) -> InvitationPublic:
     require_child_access(db, child_id, user, CarePermission.MANAGE_CARE_TEAM.value)
-    if payload.target_role not in {UserRole.GUARDIAN, UserRole.CARE_PROVIDER}:
+    if payload.target_role not in {UserRole.GUARDIAN, UserRole.CARE_PROVIDER, UserRole.CENTER}:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Only guardians and care providers can join a child's care team",
+            detail="Only guardians, care providers and center accounts can join a child's care team",
         )
 
     email = str(payload.email).lower().strip()

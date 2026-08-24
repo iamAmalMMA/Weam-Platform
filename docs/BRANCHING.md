@@ -12,4 +12,7 @@
   - `feat/ai-assistant`
   - `feat/chat`
   - `feat/centers`
+  - `feat/communication-upgrade`
+  - `feat/center-accounts`
+  - `feat/admin-dashboard`
 - Merge only after the feature works end-to-end and basic tests pass.

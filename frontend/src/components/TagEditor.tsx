@@ -48,7 +48,7 @@ export default function TagEditor({ label, value, onChange, placeholder, hint }:
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
             onBlur={add}
-            placeholder={placeholder ?? 'اكتبي ثم اضغطي Enter'}
+            placeholder={placeholder ?? 'اكتبي ثم اضغطي إدخال'}
           />
           <button type="button" className="btn btn-soft btn-small" onClick={add}>
             إضافة

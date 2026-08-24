@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import type { ChildProfile, FollowUpItem } from '../types'
 import '../styles/m3-followups-notifications.css'
@@ -18,6 +18,8 @@ function formatDate(value?: string | null) {
 
 export default function FollowUpsPage() {
   const { childId } = useParams()
+  const [searchParams] = useSearchParams()
+  const sharedFollowUpId = searchParams.get('follow_up')
   const [child, setChild] = useState<ChildProfile | null>(null)
   const [items, setItems] = useState<FollowUpItem[]>([])
   const [filter, setFilter] = useState<'all' | FollowUpItem['display_status']>('all')
@@ -69,6 +71,15 @@ export default function FollowUpsPage() {
       .catch(() => setError('تعذر تحميل المتابعات أو لا توجد صلاحية للوصول إليها.'))
       .finally(() => setLoading(false))
   }, [childId])
+
+  useEffect(() => {
+    if (!sharedFollowUpId || !items.some((item) => item.id === sharedFollowUpId)) return
+    setFilter('all')
+    const timer = window.setTimeout(() => {
+      document.getElementById(`follow-up-${sharedFollowUpId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 120)
+    return () => window.clearTimeout(timer)
+  }, [items, sharedFollowUpId])
 
   const canManage = Boolean(
     child &&
@@ -282,7 +293,11 @@ export default function FollowUpsPage() {
           {visible.map((item) => {
             const missingDate = item.status === 'open' && !item.due_date
             return (
-              <article key={item.id} className={`m3-followup-card ${item.display_status} ${missingDate ? 'needs-date' : ''}`}>
+              <article
+                id={`follow-up-${item.id}`}
+                key={item.id}
+                className={`m3-followup-card ${item.display_status} ${missingDate ? 'needs-date' : ''} ${sharedFollowUpId === item.id ? 'shared-target-highlight' : ''}`}
+              >
                 <div className="m3-followup-date">
                   <span>{item.due_date ? new Date(`${item.due_date}T00:00:00`).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric' }) : '؟'}</span>
                   <small>{item.due_date ? new Date(`${item.due_date}T00:00:00`).toLocaleDateString('ar-SA-u-ca-gregory', { month: 'short' }) : 'يحتاج موعد'}</small>

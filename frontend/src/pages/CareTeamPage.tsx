@@ -152,7 +152,7 @@ export default function CareTeamPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
-  const [targetRole, setTargetRole] = useState<'care_provider' | 'guardian'>(
+  const [targetRole, setTargetRole] = useState<'care_provider' | 'guardian' | 'center'>(
     'care_provider',
   )
   const [roleLabel, setRoleLabel] = useState('')
@@ -289,7 +289,7 @@ export default function CareTeamPage() {
               ).length
             }
           </strong>
-          <small>يشمل أولياء الأمر ومقدمي الرعاية</small>
+          <small>يشمل أولياء الأمر ومقدمي الرعاية والمراكز المصرح لها</small>
         </article>
         <article>
           <span>دعوات معلقة</span>
@@ -320,11 +320,12 @@ export default function CareTeamPage() {
                 value={targetRole}
                 onChange={(event) =>
                   setTargetRole(
-                    event.target.value as 'care_provider' | 'guardian',
+                    event.target.value as 'care_provider' | 'guardian' | 'center',
                   )
                 }
               >
                 <option value="care_provider">مقدم رعاية</option>
+                <option value="center">ممثل مركز</option>
                 <option value="guardian">ولي أمر ثانوي</option>
               </select>
             </label>
@@ -348,7 +349,9 @@ export default function CareTeamPage() {
                 placeholder={
                   targetRole === 'care_provider'
                     ? 'مثال: أخصائي تخاطب'
-                    : 'مثال: والد'
+                    : targetRole === 'center'
+                      ? 'مثال: منسق الحالة في المركز'
+                      : 'مثال: والد'
                 }
               />
             </label>
@@ -465,7 +468,9 @@ export default function CareTeamPage() {
                     {invitation.role_label ||
                       (invitation.target_role === 'guardian'
                         ? 'ولي أمر ثانوي'
-                        : 'مقدم رعاية')}
+                        : invitation.target_role === 'center'
+                          ? 'ممثل مركز'
+                          : 'مقدم رعاية')}
                   </p>
                   <small>
                     تنتهي الدعوة{' '}

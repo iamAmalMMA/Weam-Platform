@@ -97,6 +97,20 @@ export default function CenterDetailsPage() {
           <dl className="center-detail-list"><div><dt>العنوان</dt><dd>{center.address}</dd></div><div><dt>ساعات العمل</dt><dd>{center.working_hours}</dd></div>{center.price_range && <div><dt>النطاق السعري</dt><dd>{center.price_range}</dd></div>}</dl>
         </article>
 
+        {center.specialists.length > 0 && (
+          <article className="center-detail-card wide">
+            <div className="center-detail-card-title"><span aria-hidden="true">♧</span><h2>فريق المركز</h2></div>
+            <div className="center-specialist-public-grid">
+              {center.specialists.map((specialist) => (
+                <div key={specialist.id}>
+                  <span>{specialist.full_name.slice(0, 1)}</span>
+                  <div><h3>{specialist.full_name}</h3><p>{specialist.professional_title} · {specialist.specialty}</p>{specialist.bio && <small>{specialist.bio}</small>}</div>
+                </div>
+              ))}
+            </div>
+          </article>
+        )}
+
         <article className="center-contact-card wide">
           <div><span className="soft-kicker">التواصل</span><h2>تواصل مباشرة مع المركز</h2><p>تحقق من توفر الخدمة والمواعيد والتكلفة قبل الزيارة.</p></div>
           <div className="center-contact-actions">

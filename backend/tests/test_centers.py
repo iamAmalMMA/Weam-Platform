@@ -53,6 +53,7 @@ def add_center(
             working_hours="الأحد–الخميس، 8:00 ص–6:00 م",
             price_range="متوسط",
             is_active=active,
+            verification_status="verified",
         )
         db.add(center)
         db.commit()

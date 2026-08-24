@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.constants import UserRole, VerificationStatus
@@ -28,6 +28,11 @@ class User(Base):
     provider_specialty: Mapped[str | None] = mapped_column(String(120), nullable=True)
     verification_status: Mapped[str] = mapped_column(
         String(24), default=VerificationStatus.UNVERIFIED.value, nullable=False
+    )
+    verification_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    verified_by_user_id: Mapped[str | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True
     )
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

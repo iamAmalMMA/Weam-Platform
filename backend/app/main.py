@@ -19,7 +19,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title=settings.app_name,
-    version="0.3.0",
+    version="0.8.0",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
@@ -38,4 +38,4 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"name": "Weam API", "status": "running", "version": "0.3.0"}
+    return {"name": "Weam API", "status": "running", "version": "0.8.0"}

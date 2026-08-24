@@ -95,7 +95,7 @@ def list_children(
             .order_by(GuardianMembership.created_at.asc())
         ).all()
         child_ids = [m.child_id for m in memberships if membership_is_active(m.access_status, m.expires_at)]
-    elif user.role == UserRole.CARE_PROVIDER.value:
+    elif user.role in {UserRole.CARE_PROVIDER.value, UserRole.CENTER.value}:
         memberships = db.scalars(
             select(CareTeamMembership)
             .where(CareTeamMembership.user_id == user.id)

@@ -15,6 +15,7 @@ export default function AppShell() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [unread, setUnread] = useState(0)
+  const [chatUnread, setChatUnread] = useState(0)
 
   useEffect(() => {
     let mounted = true
@@ -24,15 +25,22 @@ export default function AppShell() {
           if (mounted) setUnread(response.data.count)
         })
         .catch(() => undefined)
+      apiClient.get<{ count: number }>('/chat/unread-count')
+        .then((response) => {
+          if (mounted) setChatUnread(response.data.count)
+        })
+        .catch(() => undefined)
     }
     load()
     const timer = window.setInterval(load, 30000)
     const refresh = () => load()
     window.addEventListener('weam:notifications-changed', refresh)
+    window.addEventListener('weam:chat-changed', refresh)
     return () => {
       mounted = false
       window.clearInterval(timer)
       window.removeEventListener('weam:notifications-changed', refresh)
+      window.removeEventListener('weam:chat-changed', refresh)
     }
   }, [])
 
@@ -48,8 +56,14 @@ export default function AppShell() {
 
         <nav className="prototype-main-nav" aria-label="التنقل الرئيسي">
           <NavLink to="/dashboard">الرئيسية</NavLink>
-          <NavLink to="/centers">المراكز والخدمات</NavLink>
-          <NavLink to="/invitations">الدعوات</NavLink>
+          {user?.role !== 'admin' && <NavLink to="/centers">المراكز والخدمات</NavLink>}
+          {(user?.role === 'care_provider' || user?.role === 'center') && <NavLink to="/provider">مساحة مقدم الخدمة</NavLink>}
+          {user?.role === 'admin' && <NavLink to="/admin">لوحة الإدارة</NavLink>}
+          {user?.role !== 'admin' && <NavLink to="/messages" className="notification-nav-link">
+            الرسائل
+            {chatUnread > 0 && <span className="notification-nav-badge">{chatUnread > 99 ? '99+' : chatUnread}</span>}
+          </NavLink>}
+          {user?.role !== 'admin' && <NavLink to="/invitations">الدعوات</NavLink>}
           <NavLink to="/notifications" className="notification-nav-link">
             التنبيهات
             {unread > 0 && <span className="notification-nav-badge">{unread > 99 ? '99+' : unread}</span>}
@@ -74,13 +88,13 @@ export default function AppShell() {
 
       <nav className="mobile-bottom-nav" aria-label="التنقل السفلي">
         <NavLink to="/dashboard"><span>⌂</span><small>الرئيسية</small></NavLink>
-        <NavLink to="/invitations"><span>✉</span><small>الدعوات</small></NavLink>
-        {user?.role === 'guardian' ? <Link className="add-nav" to="/children/new">＋</Link> : <span className="add-nav">و</span>}
+        {user?.role === 'admin' ? <NavLink to="/admin"><span>▦</span><small>الإدارة</small></NavLink> : <NavLink to="/messages" className="mobile-notification-link"><span>✉{chatUnread > 0 && <b>{chatUnread > 9 ? '9+' : chatUnread}</b>}</span><small>الرسائل</small></NavLink>}
+        {user?.role === 'guardian' ? <Link className="add-nav" to="/children/new">＋</Link> : user?.role === 'admin' ? <Link className="add-nav" to="/admin">▦</Link> : <Link className="add-nav" to="/provider">و</Link>}
         <NavLink to="/notifications" className="mobile-notification-link">
           <span>🔔{unread > 0 && <b>{unread > 9 ? '9+' : unread}</b>}</span>
           <small>التنبيهات</small>
         </NavLink>
-        <NavLink to="/centers"><span>⌖</span><small>المراكز</small></NavLink>
+        {user?.role === 'admin' ? <NavLink to="/admin"><span>✓</span><small>المراجعة</small></NavLink> : <NavLink to="/centers"><span>⌖</span><small>المراكز</small></NavLink>}
       </nav>
     </div>
   )

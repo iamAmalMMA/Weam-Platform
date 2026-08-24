@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import type { CareTeamOverview, ChildGoal, ChildProfile, GoalStatus } from '../types'
 
@@ -30,6 +30,8 @@ function formatDate(value?: string | null) {
 
 export default function GoalsPage() {
   const { childId } = useParams()
+  const [searchParams] = useSearchParams()
+  const sharedGoalId = searchParams.get('goal')
   const [child, setChild] = useState<ChildProfile | null>(null)
   const [goals, setGoals] = useState<ChildGoal[]>([])
   const [team, setTeam] = useState<CareTeamOverview | null>(null)
@@ -63,6 +65,14 @@ export default function GoalsPage() {
       })
       .catch(() => setError('تعذر تحميل الأهداف أو لا توجد صلاحية لعرضها.'))
   }, [childId])
+
+  useEffect(() => {
+    if (!sharedGoalId || !goals.some((goal) => goal.id === sharedGoalId)) return
+    const timer = window.setTimeout(() => {
+      document.getElementById(`goal-${sharedGoalId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 120)
+    return () => window.clearTimeout(timer)
+  }, [goals, sharedGoalId])
 
   useEffect(() => {
     if (!childId || !canViewTeam) return
@@ -189,7 +199,11 @@ export default function GoalsPage() {
           {goals.map((goal) => {
             const draft = draftFor(goal)
             return (
-              <article key={goal.id} className="goal-card">
+              <article
+                id={`goal-${goal.id}`}
+                key={goal.id}
+                className={`goal-card ${sharedGoalId === goal.id ? 'shared-target-highlight' : ''}`}
+              >
                 <div className="goal-card-top">
                   <div><div className="goal-badges">{goal.category && <span>{goal.category}</span>}<span className={`goal-status ${goal.status}`}>{STATUS_LABELS[goal.status]}</span></div><h2>{goal.title}</h2><p>{goal.description || 'لا يوجد وصف إضافي.'}</p></div>
                   <strong className="goal-percent">{goal.progress_percent}%</strong>

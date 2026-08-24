@@ -2,7 +2,17 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class CenterSpecialistSummary(BaseModel):
+    id: str
+    full_name: str
+    professional_title: str
+    specialty: str
+    bio: str | None
+
+    model_config = {"from_attributes": True}
 
 
 class CenterPublic(BaseModel):
@@ -25,6 +35,7 @@ class CenterPublic(BaseModel):
     price_range: str | None
     latitude: float | None
     longitude: float | None
+    specialists: list[CenterSpecialistSummary] = Field(default_factory=list)
     is_favorite: bool
     created_at: datetime
     updated_at: datetime

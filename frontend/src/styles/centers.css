@@ -327,6 +327,13 @@
 .center-detail-tags.soft span { background: #fff8e8; color: #877126; }
 .center-age-range { display: block; color: #386760; font-size: 15px; }
 
+.center-specialist-public-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.center-specialist-public-grid > div { display:grid; grid-template-columns:44px minmax(0,1fr); align-items:start; gap:10px; padding:13px; border:1px solid #e1ece9; border-radius:16px; background:#fbfdfc; }
+.center-specialist-public-grid > div > span { width:44px; height:44px; display:grid; place-items:center; border-radius:14px; background:#e8f6f3; color:#168a87; font-weight:900; }
+.center-specialist-public-grid h3 { margin:0 0 3px; color:#3b575d; font-size:12px; }
+.center-specialist-public-grid p { margin:0; color:#72868a; font-size:10px; }
+.center-specialist-public-grid small { display:block; margin-top:5px; color:#879598; font-size:9px; line-height:1.7; }
+
 .center-detail-list { display: grid; gap: 12px; margin: 0; }
 .center-detail-list > div { display: grid; gap: 3px; padding-bottom: 10px; border-bottom: 1px solid #edf2f1; }
 .center-detail-list > div:last-child { padding-bottom: 0; border-bottom: 0; }
@@ -363,6 +370,7 @@
   .center-detail-columns { grid-template-columns: 1fr; gap: 20px; }
   .center-contact-card { align-items: stretch; flex-direction: column; }
   .center-contact-actions { display: grid; }
+  .center-specialist-public-grid { grid-template-columns:1fr; }
 }
 
 @media (max-width: 520px) {

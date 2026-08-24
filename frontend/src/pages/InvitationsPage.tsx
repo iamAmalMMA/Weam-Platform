@@ -4,9 +4,10 @@ import { apiClient } from '../api/client'
 import type { CareInvitation } from '../types'
 import '../styles/care-team.css'
 
-const roleLabels = {
+const roleLabels: Record<CareInvitation['target_role'], string> = {
   guardian: 'ولي أمر ثانوي',
   care_provider: 'مقدم رعاية',
+  center: 'ممثل مركز',
 }
 
 export default function InvitationsPage() {

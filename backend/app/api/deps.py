@@ -33,3 +33,9 @@ def require_guardian(user: User = Depends(get_current_user)) -> User:
     if user.role != UserRole.GUARDIAN.value:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Guardian account required")
     return user
+
+
+def require_admin(user: User = Depends(get_current_user)) -> User:
+    if user.role != UserRole.ADMIN.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin account required")
+    return user

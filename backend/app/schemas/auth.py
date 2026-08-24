@@ -15,7 +15,9 @@ class RegisterRequest(BaseModel):
     provider_specialty: str | None = Field(default=None, max_length=120)
 
     @model_validator(mode="after")
-    def validate_care_provider(self):
+    def validate_role(self):
+        if self.role == UserRole.ADMIN:
+            raise ValueError("Admin accounts cannot be created through public registration")
         if self.role == UserRole.CARE_PROVIDER and not self.provider_specialty:
             raise ValueError("provider_specialty is required for care providers")
         return self

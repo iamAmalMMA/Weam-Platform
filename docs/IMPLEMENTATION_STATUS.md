@@ -1,6 +1,38 @@
 # Weam implementation status
 
-## Implemented — M5: AI Center Matching (verification pending)
+## Implemented — M6–M8 (verification pending)
+
+### M6 — Communication Upgrade
+- Global messages inbox and unread count
+- Per-conversation unread state and read receipts
+- Validated private PDF/image attachments
+- Permission-aware sharing of reports, goals, and follow-ups with direct item links
+- Responsive mobile conversation flow and authenticated WebSocket updates
+- Migration `0012_communication_upgrade`
+
+### M7 — Center Accounts / Provider Experience
+- Provider workspace with only explicitly authorized child files
+- Center-owned profile and service management
+- Center specialist create/update/remove API and responsive UI
+- Guardian invitations for center accounts with granular, expiring permissions
+- Center profile edits return verified entries to review
+- Migration `0013_center_accounts`
+
+### M8 — Admin Dashboard
+- Secure CLI provisioning for the first admin; public admin registration is blocked
+- Aggregate operational summary without clinical content
+- Account and center verification/activation controls
+- Verified-center gate for the public directory and center matching
+- Dedicated administrative audit log without child clinical records
+- Migration `0014_admin_governance`
+
+### Verification
+- Added backend tests for unread/read state, attachments, sharing permissions, center accounts, guardian-controlled center access, admin isolation, and center verification.
+- Run migration, complete Backend tests, TypeScript typecheck, Frontend build, and responsive role-based UX review before closing M6–M8.
+
+---
+
+## Completed — M5: AI Center Matching
 
 ### Backend
 - Child-scoped matching endpoint and latest-result endpoint
@@ -20,7 +52,7 @@
 
 ### Verification
 - Automated M5 backend tests cover ranking, permissions, source approval, age/city/mode constraints, latest results, and insufficient data.
-- Run Backend tests, TypeScript typecheck, Frontend build, and responsive manual review before closing the milestone.
+- Backend, TypeScript, build, and responsive manual verification completed before M6–M8 work began.
 
 ---
 
