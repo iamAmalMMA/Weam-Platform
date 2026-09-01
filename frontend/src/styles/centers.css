@@ -53,7 +53,7 @@
 
 .centers-demo-note {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 12px 15px;
   border: 1px solid #eadfb8;
@@ -76,6 +76,7 @@
 }
 
 .centers-demo-note p { margin: 0; font-size: 11px; line-height: 1.7; }
+.centers-demo-note p strong { display: inline-block; margin-top: 6px; color: #8a5c0b; }
 .centers-demo-note.compact { margin-top: -7px; }
 
 .centers-filters {
@@ -241,6 +242,8 @@
 }
 
 .center-card-meta span::before { content: "✓"; margin-left: 4px; color: #4ca098; font-weight: 900; }
+
+.center-card-source { margin: 9px 0 0; color: var(--muted); font-size: 9px; }
 
 .center-card-link {
   display: flex;
