@@ -59,6 +59,8 @@ class AdminCenterUpdate(BaseModel):
     verification_status: VerificationValue | None = None
     verification_note: str | None = Field(default=None, max_length=1000)
     is_active: bool | None = None
+    source_urls: list[str] | None = Field(default=None, max_length=10)
+    mark_reviewed: bool = False
 
 
 class AdminAuditPublic(BaseModel):

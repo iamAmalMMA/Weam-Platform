@@ -511,6 +511,11 @@ export interface AdminCenter {
   is_active: boolean
   account_count: number
   account_email?: string | null
+  source_type: string
+  source_urls: string[]
+  last_reviewed_at?: string | null
+  data_confidence?: string | null
+  listing_claimed: boolean
   created_at: string
   updated_at: string
 }
