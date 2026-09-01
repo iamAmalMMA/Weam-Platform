@@ -43,7 +43,7 @@ class Center(Base):
 
     offers_in_person: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     offers_remote: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    phone: Mapped[str] = mapped_column(String(40), nullable=False)
+    phone: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     working_hours: Mapped[str] = mapped_column(String(240), nullable=False)
     price_range: Mapped[str | None] = mapped_column(String(120), nullable=True)
