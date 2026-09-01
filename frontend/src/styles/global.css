@@ -35,6 +35,23 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* Visible keyboard focus everywhere, on top of any component-specific focus style */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible,
+select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--primary-bright);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
 body { margin: 0; min-width: 320px; min-height: 100vh; background: linear-gradient(180deg, #fbfbfe 0%, #f7f7fb 100%); }
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }

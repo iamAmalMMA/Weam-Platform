@@ -140,7 +140,7 @@
   cursor: pointer;
 }
 
-.favorites-filter input { width: 17px; height: 17px; margin: 0; accent-color: #139da0; }
+.favorites-filter input { width: 17px; height: 17px; margin: 0; accent-color: var(--primary); }
 .centers-clear { border: 0; background: transparent; color: #118783; font: inherit; font-size: 11px; font-weight: 900; cursor: pointer; }
 
 .centers-alert { text-align: center; }

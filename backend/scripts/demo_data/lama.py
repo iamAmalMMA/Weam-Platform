@@ -363,7 +363,7 @@ def build(ctx: SeedContext) -> Child:
         ensure_favorite(db, user_id=guardian.id, center_id=top_matches[0]["center_id"], created_at=days_ago(now, 4))
 
     # --- Conversation / chat -------------------------------------------------
-    conversation = Conversation(child_id=child.id, kind="care_team", created_by_user_id=guardian.id,
+    conversation = Conversation(child_id=child.id, kind="direct", created_by_user_id=guardian.id,
                                  created_at=days_ago(now, 3), updated_at=days_ago(now, 1))
     db.add(conversation)
     db.flush()
@@ -380,7 +380,7 @@ def build(ctx: SeedContext) -> Child:
     msg2 = ChatMessage(
         conversation_id=conversation.id, sender_user_id=slp.id,
         body="ما فيه داعي، بس حبيت أشاركك هدف المفردات — تقدر تشوفينه في ملف لمى.",
-        message_type="shared_entity", shared_entity_type="goal", shared_entity_id=goal1.id,
+        message_type="shared", shared_entity_type="goal", shared_entity_id=goal1.id,
         shared_entity_title=goal1.title, created_at=days_ago(now, 1),
     )
     db.add(msg2)

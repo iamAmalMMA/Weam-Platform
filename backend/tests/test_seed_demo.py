@@ -187,3 +187,39 @@ def test_demo_seed_rejects_center_verification_side_effects_are_isolated():
         demo_centers = db.scalars(select(Center).where(Center.source_type == "synthetic_demo")).all()
         for center in demo_centers:
             assert center.verified_by_user_id is None
+
+
+def test_seeded_data_actually_serializes_through_the_real_api(client):
+    """DB-level checks alone missed a real bug: seeded rows can satisfy every
+    SQLAlchemy/DB constraint and still make a FastAPI response_model raise a
+    500 at serialization time (e.g. an invalid Literal value). This exercises
+    every list endpoint a guardian's browser actually calls, for every seeded
+    child, so that class of bug fails a test instead of only showing up live."""
+    with SessionLocal() as db:
+        run_seed(db, rebuild=False)
+        child_ids = {
+            ref: db.scalar(select(Child.id).where(Child.external_ref == ref))
+            for ref in CHILD_BUILDERS
+        }
+
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "guardian@weam.demo", "password": "WeamDemo123!"},
+    )
+    assert login.status_code == 200, login.text
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    endpoints = [
+        "reports",
+        "goals",
+        "follow-ups",
+        "voice-notes",
+        "conversations",
+        "assistant/threads",
+        "center-matches/latest",
+        "care-team",
+    ]
+    for ref, child_id in child_ids.items():
+        for endpoint in endpoints:
+            response = client.get(f"/api/v1/children/{child_id}/{endpoint}", headers=headers)
+            assert response.status_code == 200, f"{ref} /{endpoint} -> {response.status_code}: {response.text}"

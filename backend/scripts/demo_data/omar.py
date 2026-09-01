@@ -190,7 +190,7 @@ def build(ctx: SeedContext) -> Child:
     db.add(run)
     db.flush()
 
-    conversation = Conversation(child_id=child.id, kind="care_team", created_by_user_id=guardian.id,
+    conversation = Conversation(child_id=child.id, kind="direct", created_by_user_id=guardian.id,
                                  created_at=days_ago(now, 1), updated_at=now)
     db.add(conversation)
     db.flush()

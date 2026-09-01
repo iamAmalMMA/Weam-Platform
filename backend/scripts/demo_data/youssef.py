@@ -191,7 +191,7 @@ def build(ctx: SeedContext) -> Child:
     if top_matches:
         ensure_favorite(db, user_id=guardian.id, center_id=top_matches[0]["center_id"], created_at=days_ago(now, 5))
 
-    conversation = Conversation(child_id=child.id, kind="care_team", created_by_user_id=guardian.id,
+    conversation = Conversation(child_id=child.id, kind="direct", created_by_user_id=guardian.id,
                                  created_at=days_ago(now, 2), updated_at=days_ago(now, 2))
     db.add(conversation)
     db.flush()

@@ -215,7 +215,7 @@
 
 .matching-card-details h3 { margin: 0 0 8px; color: #668084; font-size: 10px; }
 .matching-card-details ul { margin: 0; padding-right: 18px; color: #556f74; font-size: 10px; line-height: 1.9; }
-.matching-card-details li::marker { color: #18928d; }
+.matching-card-details li::marker { color: var(--primary); }
 
 .matching-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 15px; }
 .matching-card-footer > span { color: #819194; font-size: 9px; }
