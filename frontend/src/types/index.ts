@@ -373,6 +373,8 @@ export interface Center {
   longitude?: number | null
   specialists: CenterSpecialistSummary[]
   is_favorite: boolean
+  source_type: string
+  last_reviewed_at?: string | null
   created_at: string
   updated_at: string
 }

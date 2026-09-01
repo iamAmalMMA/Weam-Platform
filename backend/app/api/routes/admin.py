@@ -81,6 +81,11 @@ def _serialize_center(db: Session, item: Center) -> AdminCenterPublic:
         is_active=item.is_active,
         account_count=len(memberships),
         account_email=first_user.email if first_user else None,
+        source_type=item.source_type,
+        source_urls=list(item.source_urls or []),
+        last_reviewed_at=item.last_reviewed_at,
+        data_confidence=item.data_confidence,
+        listing_claimed=item.listing_claimed,
         created_at=item.created_at,
         updated_at=item.updated_at,
     )

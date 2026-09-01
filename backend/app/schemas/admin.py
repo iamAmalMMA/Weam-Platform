@@ -46,6 +46,11 @@ class AdminCenterPublic(BaseModel):
     is_active: bool
     account_count: int
     account_email: str | None
+    source_type: str
+    source_urls: list[str]
+    last_reviewed_at: datetime | None
+    data_confidence: str | None
+    listing_claimed: bool
     created_at: datetime
     updated_at: datetime
 
