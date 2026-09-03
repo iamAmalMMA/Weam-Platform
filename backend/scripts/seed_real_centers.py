@@ -9,6 +9,11 @@ This is deliberately a SEPARATE script from `seed_demo.py`: real centers are
 reference data that should persist across demo resets, not synthetic data that
 gets wiped. It is safe to re-run — rows are upserted by (name, city).
 
+Coordinates are approximate, district/street-level geocodes of each center's
+own stated address, from OpenStreetMap/Nominatim (free, properly attributed,
+no paid API) — not a precise building-level geocode. Any "distance from you"
+shown in the app must be labeled as approximate for this reason.
+
 Two centers surfaced during research were deliberately excluded from this batch
 even though the initial review marked them "include":
   * Riyadh Specialized Rehabilitation Center — a direct fetch of the site found
@@ -42,6 +47,8 @@ REVIEWED_AT = datetime(2026, 9, 1, tzinfo=timezone.utc)
 REAL_CENTERS: list[dict] = [
     {
         "name": "مراكز الأوائل للرعاية والتأهيل",
+        "latitude": 24.7586458,
+        "longitude": 46.7363571,
         "city": "الرياض",
         "region": "منطقة الرياض",
         "address": "تقاطع طريق عثمان بن عفان مع طريق الملك عبدالله، الرياض",
@@ -63,6 +70,8 @@ REAL_CENTERS: list[dict] = [
     },
     {
         "name": "مركز العباقرة للرعاية النهارية",
+        "latitude": 24.6542241,
+        "longitude": 46.6710904,
         "city": "الرياض",
         "region": "منطقة الرياض",
         "address": "الرياض – حي الشرفية",
@@ -85,6 +94,8 @@ REAL_CENTERS: list[dict] = [
     },
     {
         "name": "مركز بداية لتأهيل اضطرابات التواصل",
+        "latitude": 24.8340701,
+        "longitude": 46.6801706,
         "city": "الرياض",
         "region": "منطقة الرياض",
         "address": "حي النرجس، الرياض",
@@ -103,6 +114,8 @@ REAL_CENTERS: list[dict] = [
     },
     {
         "name": "مركز تأهيل ورعاية الأطفال ذوي الإعاقة بشمال جدة",
+        "latitude": 21.8160366,
+        "longitude": 39.2157769,
         "city": "جدة",
         "region": "منطقة مكة المكرمة",
         "address": "حي الفروسية، شمال جدة",
@@ -125,6 +138,8 @@ REAL_CENTERS: list[dict] = [
     },
     {
         "name": "الجمعية الأولى للتوحد بمنطقة مكة المكرمة",
+        "latitude": 21.5864,
+        "longitude": 39.1288,
         "city": "جدة",
         "region": "منطقة مكة المكرمة",
         "address": "جدة - حي الشاطئ",
@@ -143,6 +158,8 @@ REAL_CENTERS: list[dict] = [
     },
     {
         "name": "Badghish Rehabilitation and Healthcare (BRHC)",
+        "latitude": 21.5476471,
+        "longitude": 39.1706901,
         "city": "جدة",
         "region": "منطقة مكة المكرمة",
         "address": "Ibrahim Aljaffali, Jeddah, Saudi Arabia",
@@ -192,6 +209,8 @@ def seed_real_centers(db: Session, *, check_migrations: bool = True) -> dict[str
                     city=entry["city"],
                     region=entry["region"],
                     address=entry["address"],
+                    latitude=entry.get("latitude"),
+                    longitude=entry.get("longitude"),
                     specialties=entry["specialties"],
                     services=entry["services"],
                     served_needs=entry["served_needs"],
@@ -213,6 +232,8 @@ def seed_real_centers(db: Session, *, check_migrations: bool = True) -> dict[str
             existing.description = entry["description"]
             existing.region = entry["region"]
             existing.address = entry["address"]
+            existing.latitude = entry.get("latitude")
+            existing.longitude = entry.get("longitude")
             existing.specialties = entry["specialties"]
             existing.services = entry["services"]
             existing.served_needs = entry["served_needs"]

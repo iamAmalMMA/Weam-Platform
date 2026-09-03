@@ -51,12 +51,33 @@ function sourceLabel(center: Center) {
   return `مصادر عامة · جرى الاطلاع عليها في ${date}`
 }
 
+// Straight-line (haversine) distance in km — approximate, not a driving distance.
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+function distanceLabel(center: Center, userLocation: { lat: number; lon: number } | null) {
+  if (!userLocation || center.latitude == null || center.longitude == null) return null
+  const km = distanceKm(userLocation.lat, userLocation.lon, center.latitude, center.longitude)
+  const rounded = km < 10 ? km.toFixed(1) : Math.round(km).toString()
+  return `~${rounded} كم من موقعك (تقريبي، خط مستقيم)`
+}
+
 export default function CentersPage() {
   const [centers, setCenters] = useState<Center[]>([])
   const [options, setOptions] = useState<CenterFilterOptions>({ cities: [], specialties: [], services: [] })
   const [filters, setFilters] = useState<DirectoryFilters>(EMPTY_FILTERS)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null)
+  const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState('')
   const [savingFavoriteId, setSavingFavoriteId] = useState('')
 
   useEffect(() => {
@@ -107,6 +128,26 @@ export default function CentersPage() {
     setFilters((current) => ({ ...current, [key]: value }))
   }
 
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('المتصفح لا يدعم تحديد الموقع.')
+      return
+    }
+    setLocating(true)
+    setLocationError('')
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({ lat: position.coords.latitude, lon: position.coords.longitude })
+        setLocating(false)
+      },
+      () => {
+        setLocationError('تعذر الوصول إلى موقعك. يمكنك المتابعة بدون عرض المسافة.')
+        setLocating(false)
+      },
+      { enableHighAccuracy: false, timeout: 10000 },
+    )
+  }
+
   const toggleFavorite = async (center: Center) => {
     if (savingFavoriteId) return
     setSavingFavoriteId(center.id)
@@ -145,6 +186,17 @@ export default function CentersPage() {
           بالكامل لأغراض العرض في هذه النسخة. يُنصح بالتواصل مع المركز مباشرة للتأكد من توفر الخدمة وتحديث التفاصيل.
           الظهور في الدليل لا يعني وجود شراكة أو اعتماد من وئام.
         </p>
+      </div>
+
+      <div className="centers-location-bar">
+        {userLocation ? (
+          <span className="centers-location-active">✓ يتم عرض المسافة التقريبية من موقعك الحالي</span>
+        ) : (
+          <button type="button" className="btn btn-outline btn-small" onClick={useMyLocation} disabled={locating}>
+            {locating ? 'جارٍ تحديد موقعك...' : '📍 عرض المسافة من موقعي'}
+          </button>
+        )}
+        {locationError && <span className="centers-location-error">{locationError}</span>}
       </div>
 
       <form className="centers-filters" onSubmit={(event) => event.preventDefault()}>
@@ -206,6 +258,9 @@ export default function CentersPage() {
                 <span>{ageLabel(center)}</span>
               </div>
               {sourceLabel(center) && <p className="center-card-source">{sourceLabel(center)}</p>}
+              {distanceLabel(center, userLocation) && (
+                <p className="center-card-distance">{distanceLabel(center, userLocation)}</p>
+              )}
               <Link className="center-card-link" to={`/centers/${center.id}`}>عرض المركز <span aria-hidden="true">←</span></Link>
             </article>
           ))}

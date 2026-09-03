@@ -125,8 +125,13 @@ def build(ctx: SeedContext) -> Child:
         created_at=days_ago(now, 24), updated_at=days_ago(now, 24),
     ))
 
-    # One completed follow-up (demonstrates history), one open.
+    # Two completed follow-ups in different weeks (shows a real trend on the progress
+    # chart), plus one open.
     completed_text, open_text = follow_up_actions[0], follow_up_actions[1]
+    db.add(FollowUp(child_id=child.id, title="اجتماع تعارف مع أخصائية التربية الخاصة", note="اجتماع تعارف مع أخصائية التربية الخاصة",
+                     due_date=date_days_ago(now, 20), status="completed", source_type="manual",
+                     source_label="متابعة يدوية", created_by_user_id=guardian.id,
+                     completed_by_user_id=guardian.id, completed_at=days_ago(now, 19), created_at=days_ago(now, 24)))
     db.add(FollowUp(child_id=child.id, title=completed_text, note=completed_text,
                      due_date=date_days_ago(now, 5), status="completed",
                      source_type="report_ai", source_id=follow_up_source_id(report_id, completed_text),

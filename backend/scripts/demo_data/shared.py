@@ -86,9 +86,14 @@ def _get_or_create_user(db: Session, *, email: str, full_name: str, role: str,
 
 def _get_or_create_center(db: Session, *, name: str, city: str, description: str,
                            services: list[str], specialties: list[str], served_needs: list[str],
-                           min_age_years: int | None, max_age_years: int | None) -> Center:
+                           min_age_years: int | None, max_age_years: int | None,
+                           latitude: float | None = None, longitude: float | None = None) -> Center:
     existing = db.scalar(select(Center).where(Center.name == name, Center.city == city))
     if existing:
+        if latitude is not None and longitude is not None and (existing.latitude is None or existing.longitude is None):
+            existing.latitude = latitude
+            existing.longitude = longitude
+            db.flush()
         return existing
     center = Center(
         name=name,
@@ -96,6 +101,8 @@ def _get_or_create_center(db: Session, *, name: str, city: str, description: str
         city=city,
         region="منطقة الرياض" if city == "الرياض" else "منطقة مكة المكرمة",
         address="عنوان تجريبي وهمي لأغراض العرض",
+        latitude=latitude,
+        longitude=longitude,
         specialties=specialties,
         services=services,
         served_needs=served_needs,
@@ -159,6 +166,8 @@ def build_pool(db: Session, *, now: datetime) -> SeedContext:
             served_needs=["دعم التواصل", "متابعة سمعية", "تنسيق المتابعات"],
             min_age_years=1,
             max_age_years=12,
+            latitude=24.7136,
+            longitude=46.6753,
         ),
         "mobility": _get_or_create_center(
             db,
@@ -170,6 +179,8 @@ def build_pool(db: Session, *, now: datetime) -> SeedContext:
             served_needs=["دعم حركي", "تنسيق المتابعات"],
             min_age_years=4,
             max_age_years=16,
+            latitude=24.6408,
+            longitude=46.7728,
         ),
         "education": _get_or_create_center(
             db,
@@ -181,6 +192,8 @@ def build_pool(db: Session, *, now: datetime) -> SeedContext:
             served_needs=["دعم تعليمي", "روتين منظم"],
             min_age_years=5,
             max_age_years=14,
+            latitude=21.5433,
+            longitude=39.1728,
         ),
         "early_intervention": _get_or_create_center(
             db,
@@ -192,6 +205,8 @@ def build_pool(db: Session, *, now: datetime) -> SeedContext:
             served_needs=["تنظيم حسي", "دعم أسري"],
             min_age_years=0,
             max_age_years=6,
+            latitude=21.4858,
+            longitude=39.1925,
         ),
     }
 
