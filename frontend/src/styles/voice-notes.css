@@ -9,7 +9,7 @@
 .voice-dev-note strong { color:#806626; }
 .voice-dev-note p { margin:4px 0 0; color:#8e805d; font-size:11px; line-height:1.7; }
 
-.voice-recorder-card { background:#fff; border:1px solid #deebe8; border-radius:24px; padding:clamp(20px,3vw,28px); box-shadow:0 8px 26px rgba(53,96,101,.04); display:grid; gap:16px; }
+.voice-recorder-card { background:var(--m9-surface); border:1px solid #deebe8; border-radius:24px; padding:clamp(20px,3vw,28px); box-shadow:0 8px 26px rgba(53,96,101,.04); display:grid; gap:16px; }
 .voice-recorder-copy { display:flex; gap:12px; align-items:center; }
 .voice-recorder-copy h2 { margin:0 0 4px; color:#314c52; }
 .voice-recorder-copy p { margin:0; color:#7c8c90; font-size:11px; }
@@ -24,7 +24,7 @@
 .voice-preview audio { flex:1; min-width:0; }
 
 .voice-note-list { display:grid; gap:13px; }
-.voice-note-card { background:#fff; border:1px solid #dfebe8; border-radius:23px; padding:clamp(19px,3vw,25px); box-shadow:0 7px 24px rgba(53,96,101,.035); }
+.voice-note-card { background:var(--m9-surface); border:1px solid #dfebe8; border-radius:23px; padding:clamp(19px,3vw,25px); box-shadow:0 7px 24px rgba(53,96,101,.035); }
 .voice-note-head { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
 .voice-note-head h2 { margin:7px 0 3px; color:#314b52; font-size:19px; }
 .voice-note-head p { margin:0; color:#95a0a3; font-size:9px; }

@@ -12,8 +12,6 @@ export default function HomePage() {
       <WeamConnector />
       <div className="sky-bubble bubble-one" />
       <div className="sky-bubble bubble-two" />
-      <span className="butterfly butterfly-one">✦</span>
-      <span className="butterfly butterfly-two">✦</span>
 
       <header className="welcome-nav">
         <WeamLogo to="/" compact />
@@ -26,15 +24,14 @@ export default function HomePage() {
       <section className="welcome-hero">
         <div className="welcome-copy">
           <span className="soft-kicker">منصة واحدة لفريق الطفل كله</span>
-          <WeamLogo />
           <h1>رحلة طفلك تستحق أن تُرى <span>كاملة.</span></h1>
           <p>
             تجمع وئام الأسرة والمختصين والمعلمين والمراكز حول سجل رعاية موحد،
             حتى تصل المعلومة الصحيحة للشخص الصحيح في الوقت المناسب.
           </p>
           <div className="welcome-actions">
-            <Link className="btn btn-primary btn-large" to="/login">تسجيل الدخول</Link>
-            <Link className="btn btn-white btn-large" to="/register">إنشاء حساب جديد</Link>
+            <Link className="btn btn-primary btn-large" to="/register">إنشاء حساب جديد</Link>
+            <Link className="btn btn-white btn-large" to="/login">تسجيل الدخول</Link>
           </div>
           <div className="privacy-pill">🛡️ بيانات آمنة ومحمية • ولي الأمر يتحكم بالصلاحيات</div>
         </div>
@@ -43,13 +40,6 @@ export default function HomePage() {
           <div className="scene-frame">
             <img src="/prototype-girl.png" alt="طفلة ضمن الهوية البصرية لبروتوتايب وئام" />
             <div className="scene-wash" />
-            <div className="scene-copy">
-              <span>كل يوم خطوة جديدة نحو</span>
-              <strong>تطوير طفلك وتمكينه 💛</strong>
-            </div>
-            <div className="scene-card scene-card-one">👩‍⚕️ <b>المختص</b></div>
-            <div className="scene-card scene-card-two">🏫 <b>المعلم</b></div>
-            <div className="scene-card scene-card-three">👨‍👩‍👧 <b>الأسرة</b></div>
           </div>
         </div>
       </section>

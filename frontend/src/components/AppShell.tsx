@@ -11,7 +11,7 @@ const roleLabels = {
   admin: 'إدارة وئام',
 }
 
-type ShellIconName = 'home' | 'centers' | 'provider' | 'messages' | 'invitations' | 'notifications' | 'add' | 'admin' | 'menu' | 'close' | 'logout'
+type ShellIconName = 'home' | 'centers' | 'provider' | 'messages' | 'invitations' | 'notifications' | 'add' | 'admin' | 'menu' | 'close' | 'logout' | 'settings'
 
 type NavEntry = {
   to: string
@@ -32,6 +32,7 @@ function ShellIcon({ name }: { name: ShellIconName }) {
   if (name === 'admin') return <svg {...common}><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
   if (name === 'menu') return <svg {...common}><path d="M4 7h16M4 12h16M4 17h16" /></svg>
   if (name === 'close') return <svg {...common}><path d="m6 6 12 12M18 6 6 18" /></svg>
+  if (name === 'settings') return <svg {...common}><circle cx="12" cy="12" r="3.2" /><path d="M12 2.5v3M12 18.5v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2.5 12h3M18.5 12h3M4.9 19.1 7 17M17 7l2.1-2.1" /></svg>
   return <svg {...common}><path d="M10 17l5-5-5-5M15 12H3" /><path d="M15 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" /></svg>
 }
 
@@ -99,6 +100,7 @@ export default function AppShell() {
       return [
         { to: '/admin', label: 'لوحة الإدارة', icon: 'admin' },
         { to: '/notifications', label: 'التنبيهات', icon: 'notifications', badge: unread },
+        { to: '/settings', label: 'الإعدادات', icon: 'settings' },
       ]
     }
     const entries: NavEntry[] = [
@@ -112,6 +114,7 @@ export default function AppShell() {
       { to: '/notifications', label: 'التنبيهات', icon: 'notifications', badge: unread },
     )
     if (user?.role === 'guardian') entries.push({ to: '/children/new', label: 'إضافة طفل', icon: 'add' })
+    entries.push({ to: '/settings', label: 'الإعدادات', icon: 'settings' })
     return entries
   }, [chatUnread, unread, user?.role])
 

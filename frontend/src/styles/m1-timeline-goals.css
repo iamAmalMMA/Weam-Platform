@@ -13,7 +13,7 @@
 .m1-count-card strong { font-size:28px; color:var(--teal-dark); }
 .m1-count-card span { font-size:10px; color:var(--muted); }
 
-.m1-form-card { background:#fff; border:1px solid #deece9; border-radius:24px; padding:clamp(20px,3vw,28px); box-shadow:var(--soft-shadow); display:grid; gap:15px; }
+.m1-form-card { background:var(--m9-surface); border:1px solid #deece9; border-radius:24px; padding:clamp(20px,3vw,28px); box-shadow:var(--soft-shadow); display:grid; gap:15px; }
 .m1-section-heading { display:flex; align-items:center; gap:12px; }
 .m1-section-heading > span { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background:var(--teal-soft); color:var(--teal-dark); font-size:20px; }
 .m1-section-heading h2 { margin:0 0 3px; }
@@ -37,7 +37,7 @@
 }
 
 .goals-grid { display:grid; gap:14px; }
-.goal-card { background:#fff; border:1px solid #e1ece9; border-radius:24px; padding:clamp(19px,2.6vw,25px); box-shadow:0 10px 30px rgba(53,96,101,.05); }
+.goal-card { background:var(--m9-surface); border:1px solid #e1ece9; border-radius:24px; padding:clamp(19px,2.6vw,25px); box-shadow:0 10px 30px rgba(53,96,101,.05); }
 .goal-card-top { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
 .goal-card-top h2 { margin:7px 0; font-size:21px; color:#2d464e; }
 .goal-card-top p { margin:0; color:var(--muted); line-height:1.72; }
@@ -59,7 +59,7 @@
 .goal-update-box h3 { margin:0; font-size:15px; }
 .goal-update-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .goal-update-controls label { display:grid; gap:6px; color:#425b61; font-weight:800; font-size:11px; }
-.goal-update-controls input,.goal-update-controls select { border:1px solid #dce8e5; background-color:#fff; min-height:42px; border-radius:13px; padding:8px 11px; color:#31484f; }
+.goal-update-controls input,.goal-update-controls select { border:1px solid #dce8e5; background-color:var(--m9-surface); min-height:42px; border-radius:13px; padding:8px 11px; color:#31484f; }
 
 .goal-history { margin-top:17px; border-top:1px solid #e9f0ee; padding-top:14px; }
 .m1-subheading { display:flex; align-items:center; gap:8px; margin-bottom:9px; }
@@ -73,10 +73,10 @@
 .goal-history-item small { color:#96a2a5; font-size:9px; }
 .m1-footer-link { display:flex; justify-content:center; }
 
-.timeline-filter-card { background:#fff; border:1px solid #e1ece9; border-radius:18px; padding:12px 15px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.timeline-filter-card { background:var(--m9-surface); border:1px solid #e1ece9; border-radius:18px; padding:12px 15px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .timeline-filter-card > span { font-weight:900; color:#3a545a; font-size:12px; }
 .timeline-filters { display:flex; gap:6px; flex-wrap:wrap; }
-.timeline-filters button { border:1px solid #dce8e5; background:#fff; color:#6d7f83; border-radius:999px; padding:6px 11px; font-size:10px; font-weight:800; }
+.timeline-filters button { border:1px solid #dce8e5; background:var(--m9-surface); color:#6d7f83; border-radius:999px; padding:6px 11px; font-size:10px; font-weight:800; }
 .timeline-filters button.active { background:var(--teal); color:#fff; border-color:var(--teal); }
 
 .timeline-stream { position:relative; display:grid; gap:9px; padding-right:18px; }
@@ -86,7 +86,7 @@
 .timeline-event.team .timeline-event-icon { background:#f7eef2; color:#c07b91; }
 .timeline-event.report .timeline-event-icon { background:#eef1ff; color:#756bc6; }
 .timeline-event.goal .timeline-event-icon { background:#fff6dd; color:#c69522; }
-.timeline-event-body { background:#fff; border:1px solid #e1ece9; border-radius:18px; padding:13px 16px; min-height:92px; display:grid; align-content:center; box-shadow:0 6px 20px rgba(53,96,101,.035); }
+.timeline-event-body { background:var(--m9-surface); border:1px solid #e1ece9; border-radius:18px; padding:13px 16px; min-height:92px; display:grid; align-content:center; box-shadow:0 6px 20px rgba(53,96,101,.035); }
 .timeline-event-head { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; }
 .timeline-event-head h2 { margin:4px 0 0; font-size:15px; color:#304a50; }
 .timeline-event-type { color:var(--teal-dark); font-weight:900; font-size:9px; }

@@ -23,6 +23,7 @@ import ProviderDashboardPage from './pages/ProviderDashboardPage'
 import RegisterPage from './pages/RegisterPage'
 import ReportAIPage from './pages/ReportAIPage'
 import ReportsPage from './pages/ReportsPage'
+import SettingsPage from './pages/SettingsPage'
 import TimelinePage from './pages/TimelinePage'
 import VoiceNotesPage from './pages/VoiceNotesPage'
 
@@ -36,6 +37,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/provider" element={<ProviderDashboardPage />} />
           <Route path="/provider/center" element={<CenterManagementPage />} />

@@ -58,7 +58,7 @@
   padding: 14px 17px;
   border: 1px solid #e0ebe9;
   border-radius: 18px;
-  background: #fff;
+  background:var(--m9-surface);
   color: #6f8488;
   font: inherit;
   cursor: pointer;
@@ -92,7 +92,7 @@
   box-sizing: border-box;
   border: 1px solid #d8e6e3;
   border-radius: 11px;
-  background: #fff;
+  background:var(--m9-surface);
   color: #3e5e63;
   font: inherit;
   padding: 10px 11px;
@@ -124,7 +124,7 @@
   padding: 13px 14px;
   border: 1px solid #eee7c9;
   border-radius: 15px;
-  background: #fff;
+  background:var(--m9-surface);
 }
 
 .m3-suggestion-card > div:first-child { display: grid; gap: 5px; }
@@ -155,7 +155,7 @@
   padding: 4px;
   border: 1px solid #e2ecea;
   border-radius: 13px;
-  background: #fff;
+  background:var(--m9-surface);
 }
 
 .m3-filter-tabs button {
@@ -181,7 +181,7 @@
   padding: 15px;
   border: 1px solid #dfeae8;
   border-radius: 19px;
-  background: #fff;
+  background:var(--m9-surface);
 }
 
 .m3-followup-card.overdue { border-color: #efd7d2; background: #fffdfc; }
@@ -238,7 +238,7 @@
   place-items: center;
   border: 1px solid #ead9d6;
   border-radius: 10px;
-  background: #fff;
+  background:var(--m9-surface);
   color: #9e5c55;
   cursor: pointer;
 }
@@ -265,7 +265,7 @@
   place-items: center;
   border: 1px solid #dfe9e7;
   border-radius: 12px;
-  background: #fff;
+  background:var(--m9-surface);
   text-decoration: none;
 }
 
@@ -327,7 +327,7 @@
   padding: 14px 15px;
   border: 1px solid #dfe9e7;
   border-radius: 17px;
-  background: #fff;
+  background:var(--m9-surface);
   color: inherit;
   text-align: start;
   cursor: pointer;
@@ -401,7 +401,7 @@
   place-items: center;
   flex: 0 0 auto;
   border-radius: 12px;
-  background: #fff;
+  background:var(--m9-surface);
   color: #148b87;
   font-weight: 900;
 }
@@ -461,7 +461,7 @@
   box-sizing: border-box;
   border: 1px solid #e6dbc0;
   border-radius: 10px;
-  background: #fff;
+  background:var(--m9-surface);
   color: #4c6368;
   font: inherit;
   padding: 8px 9px;

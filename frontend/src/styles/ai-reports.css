@@ -11,14 +11,14 @@
 .ai-safety-banner { background:#f7fbfa; border:1px solid #dfece9; }
 .ai-development-banner { background:#fff9e9; border:1px solid #f2e6bf; }
 .ai-safety-banner > span,
-.ai-development-banner > span { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background:#fff; flex:0 0 auto; }
+.ai-development-banner > span { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background:var(--m9-surface); flex:0 0 auto; }
 .ai-safety-banner strong,
 .ai-development-banner strong { color:#36535a; }
 .ai-safety-banner p,
 .ai-development-banner p { margin:3px 0 0; color:#718287; font-size:11px; line-height:1.7; }
 
 .ai-analysis-list { display:grid; gap:14px; }
-.ai-analysis-card { background:#fff; border:1px solid #ded9f2; border-radius:25px; padding:clamp(20px,3vw,28px); box-shadow:0 8px 28px rgba(67,56,202,.05); }
+.ai-analysis-card { background:var(--m9-surface); border:1px solid #ded9f2; border-radius:25px; padding:clamp(20px,3vw,28px); box-shadow:0 8px 28px rgba(67,56,202,.05); }
 .ai-analysis-card.approved { border-color:#cfe9dc; }
 .ai-analysis-card.rejected { opacity:.78; }
 .ai-analysis-head { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; border-bottom:1px solid #edf2f1; padding-bottom:14px; margin-bottom:16px; }
@@ -51,7 +51,7 @@
 .ai-review-editor { display:grid; gap:13px; }
 .ai-review-editor h3 { margin:0; color:#345158; }
 .ai-review-editor label { display:grid; gap:6px; color:#49646a; font-size:11px; font-weight:800; }
-.ai-review-editor textarea { width:100%; resize:vertical; border:1px solid #dce8e5; border-radius:15px; padding:11px 13px; color:#324c52; background:#fff; line-height:1.65; }
+.ai-review-editor textarea { width:100%; resize:vertical; border:1px solid #dce8e5; border-radius:15px; padding:11px 13px; color:#324c52; background:var(--m9-surface); line-height:1.65; }
 .ai-review-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
 .ai-review-actions { display:flex; flex-wrap:wrap; gap:9px; }
 .ai-failed-box { border-radius:17px; background:#fff0f0; border:1px solid #f1d7d7; padding:15px 17px; color:#8d5555; }
