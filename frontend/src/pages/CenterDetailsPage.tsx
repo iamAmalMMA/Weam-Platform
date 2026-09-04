@@ -128,8 +128,9 @@ export default function CenterDetailsPage() {
         <article className="center-contact-card wide">
           <div><span className="soft-kicker">التواصل</span><h2>تواصل مباشرة مع المركز</h2><p>تحقق من توفر الخدمة والمواعيد والتكلفة قبل الزيارة.</p></div>
           <div className="center-contact-actions">
-            <a className="btn btn-primary" href={`tel:${center.phone.replace(/\s/g, '')}`}>اتصال: <bdi>{center.phone}</bdi></a>
+            {center.phone && <a className="btn btn-primary" href={`tel:${center.phone.replace(/\s/g, '')}`}>اتصال: <bdi>{center.phone}</bdi></a>}
             {center.email && <a className="btn btn-white" href={`mailto:${center.email}`}>إرسال بريد إلكتروني</a>}
+            {!center.phone && !center.email && <p className="muted">رقم التواصل غير متوفر من المصدر العام — راجعي القسم أعلاه لمزيد من التفاصيل.</p>}
           </div>
         </article>
       </div>

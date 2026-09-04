@@ -31,13 +31,17 @@ def test_seeded_real_centers_are_tagged_and_sourced():
             assert row.source_type == "public_research"
             assert row.source_urls, f"{row.name} is missing source_urls"
             assert row.last_reviewed_at is not None
-            assert row.data_confidence == "high"
+            # Hand-verified (own official site) centers carry "high" confidence;
+            # OSM-sourced ones (not directly reviewed against an official site)
+            # are honestly tagged "medium".
+            assert row.data_confidence in {"high", "medium"}
             # Real centers must never be pre-marked as verified by Weam merely
-            # because public information was found — that is a separate admin step.
+            # because public information was found — that is a separate admin step
+            # (see scripts/verify_real_centers.py).
             assert row.verification_status == "unverified"
 
 
-def test_seed_real_centers_covers_both_cities():
+def test_seed_real_centers_covers_expected_cities():
     with SessionLocal() as db:
         seed_real_centers(db, check_migrations=False)
         cities = {
@@ -46,4 +50,4 @@ def test_seed_real_centers_covers_both_cities():
                 select(Center.city).where(Center.source_type == "public_research")
             ).all()
         }
-        assert cities == {"الرياض", "جدة"}
+        assert cities == {"الرياض", "جدة", "الدمام", "المدينة المنورة", "أبها"}

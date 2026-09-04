@@ -102,6 +102,7 @@ def get_center_filter_options(
         select(Center).where(
             Center.is_active.is_(True),
             Center.verification_status == "verified",
+            Center.source_type != "synthetic_demo",
         )
     ).all()
     return CenterFilterOptions(
@@ -133,6 +134,7 @@ def list_centers(
             .where(
                 Center.is_active.is_(True),
                 Center.verification_status == "verified",
+                Center.source_type != "synthetic_demo",
             )
             .order_by(Center.name.asc())
         ).all()

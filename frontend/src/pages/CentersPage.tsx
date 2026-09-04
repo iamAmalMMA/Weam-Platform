@@ -6,6 +6,7 @@ import '../styles/centers.css'
 
 type DeliveryMode = '' | 'in_person' | 'remote' | 'both'
 type AgeGroup = '' | '0-5' | '6-12' | '13-18' | '18+'
+type SortOption = 'recommended' | 'closest' | 'favorites' | 'name'
 
 interface DirectoryFilters {
   q: string
@@ -62,9 +63,14 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
-function distanceLabel(center: Center, userLocation: { lat: number; lon: number } | null) {
+function distanceValue(center: Center, userLocation: { lat: number; lon: number } | null) {
   if (!userLocation || center.latitude == null || center.longitude == null) return null
-  const km = distanceKm(userLocation.lat, userLocation.lon, center.latitude, center.longitude)
+  return distanceKm(userLocation.lat, userLocation.lon, center.latitude, center.longitude)
+}
+
+function distanceLabel(center: Center, userLocation: { lat: number; lon: number } | null) {
+  const km = distanceValue(center, userLocation)
+  if (km == null) return null
   const rounded = km < 10 ? km.toFixed(1) : Math.round(km).toString()
   return `~${rounded} كم من موقعك (تقريبي، خط مستقيم)`
 }
@@ -79,6 +85,7 @@ export default function CentersPage() {
   const [locating, setLocating] = useState(false)
   const [locationError, setLocationError] = useState('')
   const [savingFavoriteId, setSavingFavoriteId] = useState('')
+  const [sortBy, setSortBy] = useState<SortOption>('recommended')
 
   useEffect(() => {
     apiClient.get<CenterFilterOptions>('/centers/filter-options')
@@ -123,6 +130,27 @@ export default function CentersPage() {
     () => Object.entries(filters).some(([, value]) => Boolean(value)),
     [filters],
   )
+
+  const sortedCenters = useMemo(() => {
+    const list = [...centers]
+    if (sortBy === 'closest') {
+      return list.sort((a, b) => {
+        const da = distanceValue(a, userLocation)
+        const db = distanceValue(b, userLocation)
+        if (da == null && db == null) return 0
+        if (da == null) return 1
+        if (db == null) return -1
+        return da - db
+      })
+    }
+    if (sortBy === 'favorites') {
+      return list.sort((a, b) => Number(b.is_favorite) - Number(a.is_favorite) || a.name.localeCompare(b.name, 'ar'))
+    }
+    if (sortBy === 'name') {
+      return list.sort((a, b) => a.name.localeCompare(b.name, 'ar'))
+    }
+    return list
+  }, [centers, sortBy, userLocation])
 
   const updateFilter = <K extends keyof DirectoryFilters,>(key: K, value: DirectoryFilters[K]) => {
     setFilters((current) => ({ ...current, [key]: value }))
@@ -223,7 +251,19 @@ export default function CentersPage() {
 
       <div className="centers-results-head">
         <div><span className="soft-kicker">نتائج الدليل</span><h2>{loading ? 'جارٍ البحث...' : `${centers.length} مركز`}</h2></div>
+        <label className="centers-sort">
+          <span>الترتيب حسب</span>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)}>
+            <option value="recommended">مقترح (المفضلة أولاً)</option>
+            <option value="closest">الأقرب أولاً</option>
+            <option value="favorites">المفضلة أولاً</option>
+            <option value="name">الاسم (أبجديًا)</option>
+          </select>
+        </label>
       </div>
+      {sortBy === 'closest' && !userLocation && (
+        <p className="centers-sort-hint">فعّلي «عرض المسافة من موقعي» أعلاه لترتيب المراكز حسب الأقرب فعليًا.</p>
+      )}
 
       {loading ? (
         <div className="centers-loading" aria-live="polite"><div className="spinner" /><span>جاري تحميل المراكز...</span></div>
@@ -236,7 +276,7 @@ export default function CentersPage() {
         </div>
       ) : (
         <div className="centers-grid">
-          {centers.map((center) => (
+          {sortedCenters.map((center) => (
             <article className="center-card" key={center.id}>
               <div className="center-card-head">
                 <span className="center-card-icon" aria-hidden="true">⌂</span>
