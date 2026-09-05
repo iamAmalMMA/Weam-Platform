@@ -33,6 +33,7 @@ def add_center(
     in_person: bool = True,
     remote: bool = False,
     active: bool = True,
+    source_type: str = "public_research",
 ) -> str:
     with SessionLocal() as db:
         center = Center(
@@ -54,6 +55,7 @@ def add_center(
             price_range="متوسط",
             is_active=active,
             verification_status="verified",
+            source_type=source_type,
         )
         db.add(center)
         db.commit()

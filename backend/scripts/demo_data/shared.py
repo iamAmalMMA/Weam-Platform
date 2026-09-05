@@ -1,0 +1,414 @@
+"""Shared pool (guardians, specialists, demo centers) and helpers for the
+four-child demo seed. See docs/SEED_DATA_ARCHITECTURE.md for the design.
+"""
+from __future__ import annotations
+
+import uuid
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from starlette.datastructures import Headers, UploadFile
+
+from app.core.constants import GuardianType, UserRole, VerificationStatus
+from app.models.care_team import AccessAuditLog
+from app.models.center import Center
+from app.models.follow_up import NotificationReceipt
+from app.models.user import User
+from app.models.voice_note import VoiceNote
+from app.services.access import AccessGrant
+from app.services.security import hash_password
+from app.services.storage import LocalReportStorage, LocalVoiceStorage, StoredFile
+
+DEMO_BATCH = "weam-demo-2026"
+DEMO_PASSWORD = "WeamDemo123!"
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+
+
+@dataclass
+class SeedContext:
+    db: Session
+    now: datetime
+    guardian: User
+    secondary_guardian: User
+    specialists: dict[str, User]
+    center_rep: User
+    centers: dict[str, Center]
+    report_storage: LocalReportStorage = field(default_factory=LocalReportStorage)
+    voice_storage: LocalVoiceStorage = field(default_factory=LocalVoiceStorage)
+
+    def guardian_grant(self) -> AccessGrant:
+        return AccessGrant(
+            membership_id="seed",
+            access_role="guardian",
+            permissions=[],
+            guardian_type=GuardianType.PRIMARY.value,
+            is_primary_guardian=True,
+        )
+
+
+def days_ago(now: datetime, n: int) -> datetime:
+    return now - timedelta(days=n)
+
+
+def days_from_now(now: datetime, n: int) -> datetime:
+    return now + timedelta(days=n)
+
+
+def date_days_ago(now: datetime, n: int) -> date:
+    return days_ago(now, n).date()
+
+
+def date_days_from_now(now: datetime, n: int) -> date:
+    return days_from_now(now, n).date()
+
+
+def _get_or_create_user(db: Session, *, email: str, full_name: str, role: str,
+                         provider_specialty: str | None = None) -> User:
+    existing = db.scalar(select(User).where(User.email == email))
+    if existing:
+        return existing
+    user = User(
+        email=email,
+        full_name=full_name,
+        password_hash=hash_password(DEMO_PASSWORD),
+        role=role,
+        provider_specialty=provider_specialty,
+        verification_status=VerificationStatus.VERIFIED.value,
+        auth_provider="password",
+        demo_batch=DEMO_BATCH,
+    )
+    db.add(user)
+    db.flush()
+    return user
+
+
+def _get_or_create_center(db: Session, *, name: str, city: str, description: str,
+                           services: list[str], specialties: list[str], served_needs: list[str],
+                           min_age_years: int | None, max_age_years: int | None,
+                           latitude: float | None = None, longitude: float | None = None) -> Center:
+    existing = db.scalar(select(Center).where(Center.name == name, Center.city == city))
+    if existing:
+        if latitude is not None and longitude is not None and (existing.latitude is None or existing.longitude is None):
+            existing.latitude = latitude
+            existing.longitude = longitude
+            db.flush()
+        return existing
+    center = Center(
+        name=name,
+        description=description,
+        city=city,
+        region="منطقة الرياض" if city == "الرياض" else "منطقة مكة المكرمة",
+        address="عنوان تجريبي وهمي لأغراض العرض",
+        latitude=latitude,
+        longitude=longitude,
+        specialties=specialties,
+        services=services,
+        served_needs=served_needs,
+        min_age_years=min_age_years,
+        max_age_years=max_age_years,
+        offers_in_person=True,
+        offers_remote=False,
+        phone="0500000000",
+        email=None,
+        working_hours="الأحد – الخميس، 9ص – 5م (بيانات تجريبية)",
+        is_active=True,
+        verification_status="verified",
+        source_type="synthetic_demo",
+        source_urls=[],
+        data_confidence=None,
+    )
+    db.add(center)
+    db.flush()
+    return center
+
+
+def build_pool(db: Session, *, now: datetime) -> SeedContext:
+    guardian = _get_or_create_user(
+        db, email="guardian@weam.demo", full_name="منى الشمري", role=UserRole.GUARDIAN.value,
+    )
+    secondary_guardian = _get_or_create_user(
+        db, email="guardian2@weam.demo", full_name="فهد الشمري", role=UserRole.GUARDIAN.value,
+    )
+
+    specialists = {
+        "slp": _get_or_create_user(
+            db, email="slp@weam.demo", full_name="سارة العتيبي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="نطق وتخاطب",
+        ),
+        "pt": _get_or_create_user(
+            db, email="pt@weam.demo", full_name="خالد الدوسري", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="علاج طبيعي",
+        ),
+        "edu": _get_or_create_user(
+            db, email="edu@weam.demo", full_name="منى الحربي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="تربية خاصة",
+        ),
+        "ot": _get_or_create_user(
+            db, email="ot@weam.demo", full_name="هند القحطاني", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="علاج وظيفي",
+        ),
+        "audiologist": _get_or_create_user(
+            db, email="audiologist@weam.demo", full_name="ضحى الزهراني", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="سمعيات",
+        ),
+        "behavioral": _get_or_create_user(
+            db, email="behavioral@weam.demo", full_name="سلطان الغامدي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="تعديل سلوك",
+        ),
+        "psych_edu": _get_or_create_user(
+            db, email="psych.edu@weam.demo", full_name="لطيفة الشهري", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="نفسي تربوي",
+        ),
+        "teacher_lama": _get_or_create_user(
+            db, email="teacher.lama@weam.demo", full_name="ريم القرني", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلمة تربية خاصة",
+        ),
+        "teacher_youssef": _get_or_create_user(
+            db, email="teacher.youssef@weam.demo", full_name="بندر السبيعي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلم تربية بدنية مساندة",
+        ),
+        "teacher_rawan": _get_or_create_user(
+            db, email="teacher.rawan@weam.demo", full_name="نورة الحارثي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلمة الصف",
+        ),
+        "teacher_omar": _get_or_create_user(
+            db, email="teacher.omar@weam.demo", full_name="فاطمة الدوسري", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلمة روضة",
+        ),
+    }
+
+    center_rep = _get_or_create_user(
+        db, email="center@weam.demo", full_name="عبدالله المطيري", role=UserRole.CENTER.value,
+    )
+
+    centers = {
+        "hearing": _get_or_create_center(
+            db,
+            name="مركز تجريبي للسمعيات والتخاطب",
+            city="الرياض",
+            description="مركز تجريبي (بيانات اصطناعية) لخدمات السمعيات والنطق والتخاطب.",
+            services=["سمعيات", "نطق وتخاطب", "متابعة سمعية"],
+            specialties=["ضعف سمع", "اضطرابات النطق واللغة"],
+            served_needs=["دعم التواصل", "متابعة سمعية", "تنسيق المتابعات"],
+            min_age_years=1,
+            max_age_years=12,
+            latitude=24.7136,
+            longitude=46.6753,
+        ),
+        "mobility": _get_or_create_center(
+            db,
+            name="مركز تجريبي للتأهيل الحركي",
+            city="الرياض",
+            description="مركز تجريبي (بيانات اصطناعية) للعلاج الطبيعي والدعم الحركي.",
+            services=["علاج طبيعي", "دعم حركي"],
+            specialties=["إعاقة حركية", "ضعف توازن"],
+            served_needs=["دعم حركي", "تنسيق المتابعات"],
+            min_age_years=4,
+            max_age_years=16,
+            latitude=24.6408,
+            longitude=46.7728,
+        ),
+        "education": _get_or_create_center(
+            db,
+            name="مركز تجريبي للدعم التعليمي",
+            city="جدة",
+            description="مركز تجريبي (بيانات اصطناعية) لخدمات الدعم التعليمي والتربية الخاصة.",
+            services=["دعم تعليمي", "تربية خاصة"],
+            specialties=["صعوبات تعلم", "تأخر أكاديمي"],
+            served_needs=["دعم تعليمي", "روتين منظم"],
+            min_age_years=5,
+            max_age_years=14,
+            latitude=21.5433,
+            longitude=39.1728,
+        ),
+        "early_intervention": _get_or_create_center(
+            db,
+            name="مركز تجريبي للتدخل المبكر",
+            city="جدة",
+            description="مركز تجريبي (بيانات اصطناعية) لخدمات التدخل المبكر والعلاج الوظيفي.",
+            services=["تدخل مبكر", "علاج وظيفي", "إرشاد أسري"],
+            specialties=["تنظيم حسي", "تأخر نمائي"],
+            served_needs=["تنظيم حسي", "دعم أسري"],
+            min_age_years=0,
+            max_age_years=6,
+            latitude=21.4858,
+            longitude=39.1925,
+        ),
+    }
+
+    _ensure_center_account(db, center=centers["early_intervention"], user=center_rep)
+
+    return SeedContext(
+        db=db,
+        now=now,
+        guardian=guardian,
+        secondary_guardian=secondary_guardian,
+        specialists=specialists,
+        center_rep=center_rep,
+        centers=centers,
+    )
+
+
+def _ensure_center_account(db: Session, *, center: Center, user: User) -> None:
+    from app.models.center_account import CenterAccountMembership
+
+    existing = db.scalar(
+        select(CenterAccountMembership).where(
+            CenterAccountMembership.center_id == center.id,
+            CenterAccountMembership.user_id == user.id,
+        )
+    )
+    if existing:
+        return
+    db.add(
+        CenterAccountMembership(
+            center_id=center.id,
+            user_id=user.id,
+            account_role="owner",
+            is_active=True,
+        )
+    )
+
+
+def _upload_file(path: Path, *, filename: str, content_type: str) -> tuple[UploadFile, "object"]:
+    handle = path.open("rb")
+    size = path.stat().st_size
+    upload = UploadFile(file=handle, size=size, filename=filename, headers=Headers({"content-type": content_type}))
+    return upload, handle
+
+
+def upload_report_pdf(ctx: SeedContext, *, child_id: str, report_id: str, version_id: str,
+                       asset_filename: str) -> StoredFile:
+    path = ASSETS_DIR / asset_filename
+    upload, handle = _upload_file(path, filename=asset_filename, content_type="application/pdf")
+    try:
+        return ctx.report_storage.save_upload(
+            upload, child_id=child_id, report_id=report_id, version_id=version_id
+        )
+    finally:
+        handle.close()
+
+
+def upload_voice_wav(ctx: SeedContext, *, child_id: str, voice_note_id: str) -> StoredFile:
+    path = ASSETS_DIR / "demo_voice_sample.wav"
+    upload, handle = _upload_file(path, filename="demo_voice_sample.wav", content_type="audio/wav")
+    try:
+        return ctx.voice_storage.save_upload(upload, child_id=child_id, voice_note_id=voice_note_id)
+    finally:
+        handle.close()
+
+
+def add_audit_log(db: Session, *, child_id: str, actor_user_id: str, action: str,
+                   entity_type: str, entity_id: str | None, created_at: datetime,
+                   details: dict | None = None) -> AccessAuditLog:
+    log = AccessAuditLog(
+        id=str(uuid.uuid4()),
+        child_id=child_id,
+        actor_user_id=actor_user_id,
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        details=details or {},
+        created_at=created_at,
+    )
+    db.add(log)
+    db.flush()
+    return log
+
+
+def add_care_team_member(db: Session, *, child, specialist: User, guardian: User, role_label: str,
+                          permissions: list[str], now: datetime, invited_days_ago: int,
+                          accepted_days_ago: int) -> None:
+    """Add an accepted invitation + active membership pair for one specialist —
+    the concise version of the invite/accept pattern each journey repeats."""
+    from app.models.care_team import CareInvitation, CareTeamMembership
+
+    existing = db.scalar(
+        select(CareTeamMembership).where(
+            CareTeamMembership.child_id == child.id,
+            CareTeamMembership.user_id == specialist.id,
+        )
+    )
+    if existing:
+        return
+    invitation_created = days_ago(now, invited_days_ago)
+    db.add(CareInvitation(
+        child_id=child.id, invited_by_user_id=guardian.id, email=specialist.email,
+        target_role="care_provider", role_label=role_label, permissions=permissions,
+        status="accepted", invitation_expires_at=days_from_now(invitation_created, 14),
+        created_at=invitation_created, responded_at=days_ago(now, accepted_days_ago),
+    ))
+    db.add(CareTeamMembership(
+        child_id=child.id, user_id=specialist.id, invited_by_user_id=guardian.id,
+        role_label=role_label, permissions=permissions, access_status="active",
+        accepted_at=days_ago(now, accepted_days_ago), created_at=days_ago(now, accepted_days_ago),
+    ))
+    db.flush()
+
+
+def add_goal(db: Session, *, child, title: str, description: str, category: str,
+             progress_percent: int, assigned_to: User, created_by: User, now: datetime,
+             start_days_ago: int, update_note: str, update_days_ago: int) -> None:
+    """Concise extra-goal helper — same shape as each journey's inline goals."""
+    from app.models.goal import Goal, GoalUpdate
+
+    status = "completed" if progress_percent >= 100 else "in_progress"
+    goal = Goal(
+        child_id=child.id, title=title, description=description, category=category,
+        status=status, progress_percent=progress_percent,
+        start_date=date_days_ago(now, start_days_ago),
+        target_date=date_days_from_now(now, 30) if status != "completed" else date_days_ago(now, 5),
+        assigned_to_user_id=assigned_to.id, created_by_user_id=created_by.id,
+        created_at=days_ago(now, start_days_ago),
+    )
+    db.add(goal)
+    db.flush()
+    db.add(GoalUpdate(goal_id=goal.id, actor_user_id=assigned_to.id, note=update_note,
+                       progress_percent=progress_percent, status=status,
+                       created_at=days_ago(now, update_days_ago)))
+
+
+def add_voice_note(ctx: "SeedContext", *, child, title: str, transcript_draft: str,
+                    transcript_final: str, created_by: User, now: datetime, days_ago_created: int) -> None:
+    """Concise extra-voice-note helper — reuses the one shared demo .wav asset,
+    same as every journey's existing voice note (only the transcript differs)."""
+    voice_note_id = str(uuid.uuid4())
+    voice_stored = upload_voice_wav(ctx, child_id=child.id, voice_note_id=voice_note_id)
+    ctx.db.add(VoiceNote(
+        id=voice_note_id, child_id=child.id, title=title,
+        original_filename="demo_voice_sample.wav", content_type=voice_stored.content_type,
+        storage_key=voice_stored.key, size_bytes=voice_stored.size_bytes, sha256=voice_stored.sha256,
+        duration_seconds=2, transcription_status="completed", review_status="approved",
+        transcript_draft=transcript_draft, transcript_final=transcript_final, transcript_language="ar",
+        stt_provider="seeded_demo", stt_model="weam-demo-v1", created_by_user_id=created_by.id,
+        reviewed_by_user_id=created_by.id, reviewed_at=days_ago(now, days_ago_created),
+        created_at=days_ago(now, days_ago_created), updated_at=days_ago(now, days_ago_created),
+    ))
+
+
+def ensure_favorite(db: Session, *, user_id: str, center_id: str, created_at: datetime) -> None:
+    from app.models.center import CenterFavorite
+
+    existing = db.scalar(
+        select(CenterFavorite).where(
+            CenterFavorite.user_id == user_id, CenterFavorite.center_id == center_id
+        )
+    )
+    if existing:
+        return
+    db.add(CenterFavorite(user_id=user_id, center_id=center_id, created_at=created_at))
+
+
+def mark_read(db: Session, *, user_id: str, event_key: str) -> None:
+    existing = db.scalar(
+        select(NotificationReceipt).where(
+            NotificationReceipt.user_id == user_id,
+            NotificationReceipt.event_key == event_key,
+        )
+    )
+    if existing:
+        return
+    db.add(NotificationReceipt(user_id=user_id, event_key=event_key))

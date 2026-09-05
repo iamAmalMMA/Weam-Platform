@@ -17,7 +17,17 @@ const permissions = [
   ['message_team', 'التواصل مع الفريق'],
 ] as const
 
-const defaultProviderPermissions = permissions.map(([value]) => value)
+// Least-privilege by default: view + communicate only. Write/management permissions
+// (upload_reports, manage_goals, create_voice_notes) require the guardian to opt in
+// deliberately per care-team member, rather than granting everything up front.
+const defaultProviderPermissions = [
+  'view_profile',
+  'view_care_team',
+  'view_reports',
+  'view_goals',
+  'view_timeline',
+  'message_team',
+]
 const defaultGuardianPermissions = [
   'view_profile',
   'view_care_team',

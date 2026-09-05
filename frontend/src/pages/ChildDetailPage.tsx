@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { apiClient } from '../api/client'
+import ChildProgressCharts from '../components/ChildProgressCharts'
 import TagEditor from '../components/TagEditor'
 import type { ChildProfile } from '../types'
 
@@ -184,6 +185,8 @@ export default function ChildDetailPage() {
           ? <Link key={item.to} to={item.to}><span>{item.icon}</span>{item.shortLabel}</Link>
           : <span key={item.to} className="disabled" title={`${item.label} غير مصرح`}><i>{item.icon}</i>{item.shortLabel}</span>)}
       </nav>
+
+      <ChildProgressCharts childId={child.id} canViewGoals={canViewGoals} canViewFollowUps={canViewTimeline} />
 
       {editing && primary && (
         <form className="m9-child-edit-panel" onSubmit={saveProfile}>

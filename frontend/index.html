@@ -10,6 +10,17 @@
     <title>وئام</title>
   </head>
   <body>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('weam_theme')
+          if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme)
+          var scale = localStorage.getItem('weam_text_scale')
+          var zoom = scale === 'large' ? '1.22' : scale === 'xlarge' ? '1.38' : '1.08'
+          document.documentElement.style.setProperty('--a11y-zoom', zoom)
+        } catch (e) {}
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>

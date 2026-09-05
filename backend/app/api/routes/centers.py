@@ -70,6 +70,8 @@ def _serialize(
         longitude=center.longitude,
         specialists=list(specialists or []),
         is_favorite=center.id in favorite_ids,
+        source_type=center.source_type,
+        last_reviewed_at=center.last_reviewed_at,
         created_at=center.created_at,
         updated_at=center.updated_at,
     )
@@ -100,6 +102,7 @@ def get_center_filter_options(
         select(Center).where(
             Center.is_active.is_(True),
             Center.verification_status == "verified",
+            Center.source_type != "synthetic_demo",
         )
     ).all()
     return CenterFilterOptions(
@@ -131,6 +134,7 @@ def list_centers(
             .where(
                 Center.is_active.is_(True),
                 Center.verification_status == "verified",
+                Center.source_type != "synthetic_demo",
             )
             .order_by(Center.name.asc())
         ).all()

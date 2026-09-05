@@ -134,6 +134,7 @@ def create_center_profile(
         **payload.model_dump(mode="json"),
         is_active=True,
         verification_status="unverified",
+        source_type="center_self_registered",
     )
     db.add(center)
     db.flush()

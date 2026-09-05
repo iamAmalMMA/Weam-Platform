@@ -6,6 +6,7 @@ import '../styles/centers.css'
 
 type DeliveryMode = '' | 'in_person' | 'remote' | 'both'
 type AgeGroup = '' | '0-5' | '6-12' | '13-18' | '18+'
+type SortOption = 'recommended' | 'closest' | 'favorites' | 'name'
 
 interface DirectoryFilters {
   q: string
@@ -43,13 +44,48 @@ function ageLabel(center: Center) {
   return `حتى ${center.max_age_years} سنة`
 }
 
+function sourceLabel(center: Center) {
+  if (center.source_type !== 'public_research' || !center.last_reviewed_at) return null
+  const date = new Date(center.last_reviewed_at).toLocaleDateString('ar-SA-u-ca-gregory', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  })
+  return `مصادر عامة · جرى الاطلاع عليها في ${date}`
+}
+
+// Straight-line (haversine) distance in km — approximate, not a driving distance.
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+function distanceValue(center: Center, userLocation: { lat: number; lon: number } | null) {
+  if (!userLocation || center.latitude == null || center.longitude == null) return null
+  return distanceKm(userLocation.lat, userLocation.lon, center.latitude, center.longitude)
+}
+
+function distanceLabel(center: Center, userLocation: { lat: number; lon: number } | null) {
+  const km = distanceValue(center, userLocation)
+  if (km == null) return null
+  const rounded = km < 10 ? km.toFixed(1) : Math.round(km).toString()
+  return `~${rounded} كم من موقعك (تقريبي، خط مستقيم)`
+}
+
 export default function CentersPage() {
   const [centers, setCenters] = useState<Center[]>([])
   const [options, setOptions] = useState<CenterFilterOptions>({ cities: [], specialties: [], services: [] })
   const [filters, setFilters] = useState<DirectoryFilters>(EMPTY_FILTERS)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null)
+  const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState('')
   const [savingFavoriteId, setSavingFavoriteId] = useState('')
+  const [sortBy, setSortBy] = useState<SortOption>('recommended')
 
   useEffect(() => {
     apiClient.get<CenterFilterOptions>('/centers/filter-options')
@@ -95,8 +131,49 @@ export default function CentersPage() {
     [filters],
   )
 
+  const sortedCenters = useMemo(() => {
+    const list = [...centers]
+    if (sortBy === 'closest') {
+      return list.sort((a, b) => {
+        const da = distanceValue(a, userLocation)
+        const db = distanceValue(b, userLocation)
+        if (da == null && db == null) return 0
+        if (da == null) return 1
+        if (db == null) return -1
+        return da - db
+      })
+    }
+    if (sortBy === 'favorites') {
+      return list.sort((a, b) => Number(b.is_favorite) - Number(a.is_favorite) || a.name.localeCompare(b.name, 'ar'))
+    }
+    if (sortBy === 'name') {
+      return list.sort((a, b) => a.name.localeCompare(b.name, 'ar'))
+    }
+    return list
+  }, [centers, sortBy, userLocation])
+
   const updateFilter = <K extends keyof DirectoryFilters,>(key: K, value: DirectoryFilters[K]) => {
     setFilters((current) => ({ ...current, [key]: value }))
+  }
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('المتصفح لا يدعم تحديد الموقع.')
+      return
+    }
+    setLocating(true)
+    setLocationError('')
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({ lat: position.coords.latitude, lon: position.coords.longitude })
+        setLocating(false)
+      },
+      () => {
+        setLocationError('تعذر الوصول إلى موقعك. يمكنك المتابعة بدون عرض المسافة.')
+        setLocating(false)
+      },
+      { enableHighAccuracy: false, timeout: 10000 },
+    )
   }
 
   const toggleFavorite = async (center: Center) => {
@@ -132,7 +209,22 @@ export default function CentersPage() {
 
       <div className="centers-demo-note">
         <span aria-hidden="true">i</span>
-        <p><strong>معلومات تعريفية تجريبية</strong> — بيانات المراكز في هذه النسخة مخصصة لاستعراض الدليل، وليست إعلانًا أو توصية بجهة محددة.</p>
+        <p>
+          تعتمد معلومات المراكز على مصادر عامة جرى الاطلاع عليها في التاريخ الموضح لكل مركز، أو على بيانات تجريبية
+          بالكامل لأغراض العرض في هذه النسخة. يُنصح بالتواصل مع المركز مباشرة للتأكد من توفر الخدمة وتحديث التفاصيل.
+          الظهور في الدليل لا يعني وجود شراكة أو اعتماد من وئام.
+        </p>
+      </div>
+
+      <div className="centers-location-bar">
+        {userLocation ? (
+          <span className="centers-location-active">✓ يتم عرض المسافة التقريبية من موقعك الحالي</span>
+        ) : (
+          <button type="button" className="btn btn-outline btn-small" onClick={useMyLocation} disabled={locating}>
+            {locating ? 'جارٍ تحديد موقعك...' : '📍 عرض المسافة من موقعي'}
+          </button>
+        )}
+        {locationError && <span className="centers-location-error">{locationError}</span>}
       </div>
 
       <form className="centers-filters" onSubmit={(event) => event.preventDefault()}>
@@ -159,7 +251,19 @@ export default function CentersPage() {
 
       <div className="centers-results-head">
         <div><span className="soft-kicker">نتائج الدليل</span><h2>{loading ? 'جارٍ البحث...' : `${centers.length} مركز`}</h2></div>
+        <label className="centers-sort">
+          <span>الترتيب حسب</span>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)}>
+            <option value="recommended">مقترح (المفضلة أولاً)</option>
+            <option value="closest">الأقرب أولاً</option>
+            <option value="favorites">المفضلة أولاً</option>
+            <option value="name">الاسم (أبجديًا)</option>
+          </select>
+        </label>
       </div>
+      {sortBy === 'closest' && !userLocation && (
+        <p className="centers-sort-hint">فعّلي «عرض المسافة من موقعي» أعلاه لترتيب المراكز حسب الأقرب فعليًا.</p>
+      )}
 
       {loading ? (
         <div className="centers-loading" aria-live="polite"><div className="spinner" /><span>جاري تحميل المراكز...</span></div>
@@ -172,7 +276,7 @@ export default function CentersPage() {
         </div>
       ) : (
         <div className="centers-grid">
-          {centers.map((center) => (
+          {sortedCenters.map((center) => (
             <article className="center-card" key={center.id}>
               <div className="center-card-head">
                 <span className="center-card-icon" aria-hidden="true">⌂</span>
@@ -193,6 +297,10 @@ export default function CentersPage() {
                 <span>{deliveryLabels(center).join(' • ')}</span>
                 <span>{ageLabel(center)}</span>
               </div>
+              {sourceLabel(center) && <p className="center-card-source">{sourceLabel(center)}</p>}
+              {distanceLabel(center, userLocation) && (
+                <p className="center-card-distance">{distanceLabel(center, userLocation)}</p>
+              )}
               <Link className="center-card-link" to={`/centers/${center.id}`}>عرض المركز <span aria-hidden="true">←</span></Link>
             </article>
           ))}
