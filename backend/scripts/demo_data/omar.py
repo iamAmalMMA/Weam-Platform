@@ -25,6 +25,9 @@ from app.services.follow_up_notifications import follow_up_source_id
 from .shared import (
     SeedContext,
     add_audit_log,
+    add_care_team_member,
+    add_goal,
+    add_voice_note,
     date_days_ago,
     date_days_from_now,
     days_ago,
@@ -41,6 +44,9 @@ def build(ctx: SeedContext) -> Child:
     now = ctx.now
     guardian = ctx.guardian
     ot = ctx.specialists["ot"]
+    slp = ctx.specialists["slp"]
+    behavioral = ctx.specialists["behavioral"]
+    teacher = ctx.specialists["teacher_omar"]
 
     child = Child(created_by_user_id=guardian.id, external_ref=EXTERNAL_REF,
                   created_at=days_ago(now, 21), updated_at=now)
@@ -83,6 +89,28 @@ def build(ctx: SeedContext) -> Child:
         status=InvitationStatus.PENDING.value, invitation_expires_at=days_from_now(now, 10),
         created_at=days_ago(now, 2),
     ))
+
+    # --- Complete the care team: early-intervention case → occupational
+    # therapy (above) + speech + behavioral/developmental support, plus the
+    # nursery teacher ---------------------------------------------------------
+    add_care_team_member(
+        db, child=child, specialist=slp, guardian=guardian,
+        role_label="أخصائية نطق وتخاطب",
+        permissions=["view_profile", "view_care_team", "view_reports", "view_goals", "view_timeline", "message_team"],
+        now=now, invited_days_ago=14, accepted_days_ago=13,
+    )
+    add_care_team_member(
+        db, child=child, specialist=behavioral, guardian=guardian,
+        role_label="أخصائي تدخل مبكر سلوكي",
+        permissions=["view_profile", "view_care_team", "view_reports", "view_goals", "manage_goals", "view_timeline", "message_team"],
+        now=now, invited_days_ago=10, accepted_days_ago=9,
+    )
+    add_care_team_member(
+        db, child=child, specialist=teacher, guardian=guardian,
+        role_label="معلمة روضة",
+        permissions=["view_profile", "view_care_team", "view_goals", "view_timeline", "message_team"],
+        now=now, invited_days_ago=6, accepted_days_ago=5,
+    )
     db.flush()
 
     report_id, version_id = str(uuid.uuid4()), str(uuid.uuid4())
@@ -150,6 +178,14 @@ def build(ctx: SeedContext) -> Child:
     db.add(GoalUpdate(goal_id=goal2.id, actor_user_id=ot.id, note="بداية تحسّن مع استخدام إشارات الانتقال.",
                        progress_percent=15, status="in_progress", created_at=days_ago(now, 1)))
 
+    add_goal(
+        db, child=child, title="زيادة عدد الكلمات المفهومة",
+        description="دعم مبكر للنطق من خلال أنشطة تفاعلية بسيطة مع الأسرة.",
+        category="نطق وتخاطب", progress_percent=10, assigned_to=slp, created_by=slp,
+        now=now, start_days_ago=8, update_note="استجابة مبدئية جيدة لأنشطة تسمية الأشياء.",
+        update_days_ago=2,
+    )
+
     voice_note_id = str(uuid.uuid4())
     voice_stored = upload_voice_wav(ctx, child_id=child.id, voice_note_id=voice_note_id)
     db.add(VoiceNote(id=voice_note_id, child_id=child.id, title="ملاحظة من الأم أثناء وقت اللعب",
@@ -161,6 +197,13 @@ def build(ctx: SeedContext) -> Child:
                       transcript_language="ar", stt_provider="seeded_demo", stt_model="weam-demo-v1",
                       created_by_user_id=guardian.id, reviewed_by_user_id=guardian.id,
                       reviewed_at=days_ago(now, 2), created_at=days_ago(now, 2), updated_at=days_ago(now, 2)))
+
+    add_voice_note(
+        ctx, child=child, title="ملاحظة من معلمة الروضة بعد وقت الدائرة",
+        transcript_draft="عمر جلس مع المجموعة في وقت الدائرة اليوم أطول من المعتاد.",
+        transcript_final="عمر شارك في وقت الدائرة مع باقي الأطفال اليوم لمدة أطول من المعتاد قبل أن يحتاج استراحة.",
+        created_by=teacher, now=now, days_ago_created=3,
+    )
 
     thread = AssistantThread(child_id=child.id, created_by_user_id=guardian.id, title="متابعة التدخل المبكر",
                               created_at=now, updated_at=now)

@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import { useSettings } from '../contexts/SettingsContext'
 import type { ChildProfile } from '../types'
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { t } = useSettings()
   const [children, setChildren] = useState<ChildProfile[]>([])
   const [selectedChildId, setSelectedChildId] = useState<string>('')
   const canAccessChildren = user?.role === 'guardian' || user?.role === 'care_provider'
@@ -84,8 +86,8 @@ export default function DashboardPage() {
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="m9-dashboard-heading">
-        <div><span className="soft-kicker">مساحة العائلة</span><h1>صباح الخير، {user?.full_name}</h1><p>تابعي رحلة الرعاية، واصلي إلى أهم المهام، واحتفظي بكل تفاصيل الطفل في مكان واحد.</p></div>
-        <Link className="btn btn-primary" to="/children/new">＋ إضافة طفل</Link>
+        <div><span className="soft-kicker">{t('dashboard.kicker')}</span><h1>صباح الخير، {user?.full_name}</h1><p>تابعي رحلة الرعاية، واصلي إلى أهم المهام، واحتفظي بكل تفاصيل الطفل في مكان واحد.</p></div>
+        <Link className="btn btn-primary" to="/children/new">{t('dashboard.addChild')}</Link>
       </div>
 
       {children.length > 1 && (
@@ -111,19 +113,19 @@ export default function DashboardPage() {
           </div>
 
           <div className="dashboard-shortcuts">
-            <Link to={`/children/${selectedChild.id}/reports`} className="dashboard-shortcut-link"><span className="shortcut-icon report">▤</span><strong>التقارير</strong><small>الملفات وسجل النسخ</small></Link>
-            <Link to={`/children/${selectedChild.id}/timeline`} className="dashboard-shortcut-link"><span className="shortcut-icon appointment">↻</span><strong>الخط الزمني</strong><small>رحلة الطفل كاملة</small></Link>
-            <Link to={`/children/${selectedChild.id}/goals`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">◎</span><strong>الأهداف</strong><small>الخطة والتقدم</small></Link>
-            <Link to={`/children/${selectedChild.id}/care-team`} className="dashboard-shortcut-link"><span className="shortcut-icon note">♧</span><strong>فريق الرعاية</strong><small>إدارة الوصول</small></Link>
-            <Link to={`/children/${selectedChild.id}/center-matches`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">✦</span><strong>مراكز مناسبة</strong><small>حسب احتياجات الملف</small></Link>
+            <Link to={`/children/${selectedChild.id}/reports`} className="dashboard-shortcut-link"><span className="shortcut-icon report">▤</span><strong>{t('dashboard.shortcut.reports')}</strong></Link>
+            <Link to={`/children/${selectedChild.id}/timeline`} className="dashboard-shortcut-link"><span className="shortcut-icon appointment">↻</span><strong>{t('dashboard.shortcut.timeline')}</strong></Link>
+            <Link to={`/children/${selectedChild.id}/goals`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">◎</span><strong>{t('dashboard.shortcut.goals')}</strong></Link>
+            <Link to={`/children/${selectedChild.id}/care-team`} className="dashboard-shortcut-link"><span className="shortcut-icon note">♧</span><strong>{t('dashboard.shortcut.careTeam')}</strong></Link>
+            <Link to={`/children/${selectedChild.id}/center-matches`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">✦</span><strong>{t('dashboard.shortcut.centers')}</strong></Link>
           </div>
 
           <div className="quick-glance-card">
-            <div className="card-title-row"><div><span className="soft-kicker">نظرة سريعة</span><h2>رحلة {selectedChild.preferred_name || selectedChild.first_name} الآن</h2></div><Link to={`/children/${selectedChild.id}`}>عرض التفاصيل</Link></div>
+            <div className="card-title-row"><div><span className="soft-kicker">{t('dashboard.quickGlance')}</span><h2>رحلة {selectedChild.preferred_name || selectedChild.first_name} الآن</h2></div><Link to={`/children/${selectedChild.id}`}>{t('dashboard.viewDetails')}</Link></div>
             <div className="quick-stats">
-              <article><span>الخدمات الحالية</span><strong>{selectedChild.services.length}</strong><small>{selectedChild.services[0] || 'أضيفي خدمة أولى'}</small></article>
-              <article><span>الاحتياجات</span><strong>{selectedChild.needs.length}</strong><small>{selectedChild.needs[0] || 'غير مضافة بعد'}</small></article>
-              <article><span>الحالات</span><strong>{selectedChild.conditions.length}</strong><small>{selectedChild.conditions[0] || 'غير مصنفة'}</small></article>
+              <article><span>{t('dashboard.services')}</span><strong>{selectedChild.services.length}</strong><small>{selectedChild.services[0] || 'أضيفي خدمة أولى'}</small></article>
+              <article><span>{t('dashboard.needs')}</span><strong>{selectedChild.needs.length}</strong><small>{selectedChild.needs[0] || 'غير مضافة بعد'}</small></article>
+              <article><span>{t('dashboard.conditions')}</span><strong>{selectedChild.conditions.length}</strong><small>{selectedChild.conditions[0] || 'غير مصنفة'}</small></article>
             </div>
           </div>
 

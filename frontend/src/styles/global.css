@@ -190,9 +190,7 @@ textarea { resize: vertical; }
 .auth-scene img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 58%; opacity: .88; }
 .auth-scene::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3,82,85,.05), rgba(5,94,96,.68)); }
 .auth-scene-copy { position: relative; z-index: 2; padding: 30px; }
-.auth-scene-copy span { font-size: 13px; font-weight: 900; }
-.auth-scene-copy h1 { margin: 8px 0 10px; font-size: clamp(34px, 4vw, 52px); line-height: 1.2; }
-.auth-scene-copy p { margin: 0; line-height: 1.9; color: rgba(255,255,255,.9); max-width: 520px; }
+.auth-scene-copy h1 { margin: 0; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.25; max-width: 420px; }
 .prototype-auth-visual > small { color: rgba(255,255,255,.76); }
 .prototype-auth-form-wrap { display: grid; place-items: center; padding: 34px; }
 .prototype-auth-form { width: min(460px, 100%); }
@@ -373,7 +371,6 @@ textarea { resize: vertical; }
 
 @media (max-width: 1000px) {
   .welcome-hero { grid-template-columns: 1fr 1fr; gap: 28px; }
-  .scene-frame { width: 100%; }
   .prototype-auth-page { grid-template-columns: 1fr 1fr; }
   .care-fields-grid { grid-template-columns: 1fr; }
 }
@@ -390,7 +387,7 @@ textarea { resize: vertical; }
   .welcome-actions { justify-content: center; }
   .privacy-pill { margin-inline: auto; }
   .welcome-art { order: 2; }
-  .scene-frame { max-width: 420px; aspect-ratio: 4/4.7; border-radius: 30px; }
+  .weam-hero-art { width: min(320px, 70%); }
   .welcome-benefits { grid-template-columns: 1fr; margin-top: 18px; }
 
   .prototype-auth-page { grid-template-columns: 1fr; }
@@ -517,9 +514,9 @@ textarea { resize: vertical; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    color: #eeecf9;
+    color: #d6d4dc;
     background: #15142a;
-    --ink: #eeecf9;
+    --ink: #d6d4dc;
     --muted: #a8a2c4;
     --line: #38355c;
     --surface: #1e1c38;
@@ -548,9 +545,9 @@ textarea { resize: vertical; }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  color: #eeecf9;
+  color: #d6d4dc;
   background: #15142a;
-  --ink: #eeecf9;
+  --ink: #d6d4dc;
   --muted: #a8a2c4;
   --line: #38355c;
   --surface: #1e1c38;
@@ -584,3 +581,11 @@ textarea { resize: vertical; }
 :root[data-theme="dark"] body {
   background: linear-gradient(180deg, #17162e 0%, #15142a 100%);
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .welcome-copy h1 { color: var(--ink); }
+  :root:not([data-theme="light"]) .privacy-pill { background: rgba(43, 39, 80, .6); color: var(--muted); border-color: var(--line); }
+  :root:not([data-theme="light"]) .welcome-benefits article { background: var(--surface); border-color: var(--line); }
+}
+:root[data-theme="dark"] .welcome-copy h1 { color: var(--ink); }
+:root[data-theme="dark"] .privacy-pill { background: rgba(43, 39, 80, .6); color: var(--muted); border-color: var(--line); }
+:root[data-theme="dark"] .welcome-benefits article { background: var(--surface); border-color: var(--line); }

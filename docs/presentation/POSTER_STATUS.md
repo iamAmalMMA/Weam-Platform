@@ -1,63 +1,67 @@
-# Poster status
+# Poster status — final pass (2026-09-04)
 
-`WEAM_POSTER_DRAFT.pptx` in this folder — built from the official
-`Poster-Template.pptx` you supplied. Same working-draft caveat as the main
-deck: it's not final, since it's still missing facts only the team has.
+`KSCDR_Hackathon_114_Weam.pptx` in this folder — built on top of your own working
+draft (all header/footer facts you and the team had already filled in were kept
+untouched). Named per the submission convention:
+`KSCDR_Hackathon_000_TeamName.pptx` → `KSCDR_Hackathon_114_Weam.pptx`.
 
-## Deadline conflict — please resolve this first
+## What changed in this pass
 
-Your forwarded email says the deadline is **5 September 2026**. The
-**Poster_Guidelines.pdf itself says 4 September 2026**. Today is 2 September
-2026, so this is a one-day difference with almost no slack either way —
-worth confirming with `kscdr.hackathon@gmail.com` directly rather than
-guessing which is authoritative.
+The six content boxes were dull — three of them still ended in a plain
+"To insert: ..." text line instead of an actual visual. Guidelines *prefer* a
+diagram in Methodology, a chart/table in Results, and a screenshot in Proposed
+solution, so all three were built and inserted:
 
-## Confirmed done
+- **Methodology** — a real architecture diagram (guardian/specialist/center →
+  Weam platform → AI assistant + versioned migrations), built as native
+  PowerPoint shapes so it stays crisp at any print size (no DPI concerns —
+  vector, not a raster image).
+- **Results** — a native PowerPoint bar chart (Backend tests 111/111, DB
+  migrations 18/18, Screen sizes 5/5 — all real numbers already in the deck)
+  plus a stat callout for the contrast ratio (5.18:1 vs the 4.5:1 AA minimum),
+  since it's a different unit and doesn't belong on the same bar chart.
+- **Proposed solution** — a real screenshot of the running app's AI
+  report-analysis screen, captured at 4800×3000px via a headless browser
+  (device-scale-factor 3) so it clears the guideline's 600 DPI minimum even
+  placed at 6 inches wide (works out to ~637 DPI). It was deliberately chosen
+  because it visually proves the poster's own claim right next to it — "every
+  AI-generated output stays a labeled draft until a human reviews it" — the
+  screenshot shows the actual "مراجعة بشرية قبل الاعتماد" (human review before
+  approval) badge and "معتمد بشريًا" (human-approved) status tag live in the UI.
 
-- **Track · Category**: filled in as "Everyday Life · Individuals" (per your
-  earlier decision for the main deck — reused here for consistency).
-- **Logo box**: left empty per the guideline's own instruction ("if you have
-  no logo, delete the placeholder text and leave the box empty") — no logo
-  file was supplied.
-- **All six content boxes** filled with short bullets, person-first language,
-  no invented statistics — Introduction & problem statement, Objectives &
-  target users, Proposed solution, Methodology & system design, Results &
-  evaluation, Discussion/impact/ethics. The Results box reuses the same real,
-  verified numbers as the main deck (111/111 tests, 18/18 migrations on real
-  Postgres, 0 viewport-overflow issues, 5.18:1 worst-case contrast) and
-  explicitly labels them as engineering/QA evidence, not a user study.
-- Left plain (non-bracketed) "To insert:" notes for the three visuals the
-  guidelines prefer but don't require (a screenshot in Proposed Solution, an
-  architecture diagram in Methodology, a chart in Results) — no actual image
-  was generated or embedded.
+Each of the three boxes had its bullet list trimmed and tightened to make
+room — content moved into the visual instead of being duplicated as words next
+to it (e.g. the architecture diagram already shows "FastAPI + PostgreSQL" and
+"18 versioned migrations," so the bullets don't repeat those facts).
 
-## Still blocked on facts (same list as the main deck)
+The project title was also filled in: `[ Project title ]` → **Weam** (Cambria
+Bold 112pt, matching the guideline's recommended size — already set on the
+box). This is the one call made without asking first, since the deadline was
+today — English "Weam," matching the language of the rest of the poster and
+your own logo asset already embedded in the file, in the box's existing
+formatting.
 
-- Team number (`KSCDR_Hackathon_000` → your real number)
-- Project title (and the same "Weam vs. وئام vs. both" formatting question
-  from the main deck applies here too — I have not filled this in on the
-  poster either, unlike the main deck where I made a judgment call; here I
-  left the bracket as-is since the poster's title is the single largest,
-  most prominent element on the page and getting the formatting wrong would
-  be more visible)
-- Team members (up to 5 names) and affiliation
-- Contact person: name, email, mobile
-- QR code target (repo / demo video / live build link) — and the guidelines
-  want an *actual scannable QR image* generated from that link and embedded,
-  not just a URL typed as text; that's a follow-up step once you give me the
-  link.
+## Confirmed already done (by you/the team, before this pass)
 
-## Same verification gap as the main deck
+- Team number **114**, all 4 team members, affiliation, contact person,
+  track/category — all real, all filled in.
+- **QR code** — already embedded and decodes correctly (verified by actually
+  decoding it, not assumed): it redirects to a Google Drive folder, matching
+  "video, demo, repository, or additional files" from the guidelines.
+- Team/institution logo placed in the header box.
 
-LibreOffice isn't installed in this environment, so this could not be
-rendered to images either. Validated structurally (`validate.py --original`
-passed) and confirmed bracket-free everywhere except the four fields above.
-**Please open the real file and check the six content boxes for text
-overflow before submitting** — at 24pt Calibri in these box sizes there was
-generous room in my calculations, but "calculated" is not "observed."
+## Still worth doing yourself before submitting
 
-## One thing to double-check yourself
-The guidelines say `Section headings — Cambria Bold, 36 pt (do not change)`
-and I didn't touch them. I also didn't touch box positions/sizes, per "You
-may resize the boxes... but keep them aligned." My new body text boxes were
-placed to fit inside the existing card boundaries without resizing anything.
+- **Open the real file in PowerPoint and check for text overflow.** LibreOffice
+  isn't installed in this environment, so none of this could be rendered to
+  images for pixel-level visual QA — every measurement above is arithmetic
+  (font size × line count × box height), not something I looked at. I did the
+  math conservatively and kept every bullet short enough that it's very
+  unlikely to wrap to an extra line, but "calculated" is not "observed."
+- **Scan the QR code with an actual phone** before sending, per the
+  guideline's own instruction — I only confirmed it decodes correctly and
+  redirects somewhere real, not that the Drive folder's sharing permissions
+  are set to public.
+- **Deadline**: the guidelines PDF says 4 September 2026, which is today. If
+  that's genuinely different from what your team was told, this is the moment
+  to double check with kscdr.hackathon@gmail.com.

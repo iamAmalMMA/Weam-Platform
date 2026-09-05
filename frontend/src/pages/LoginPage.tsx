@@ -1,9 +1,10 @@
 import { FormEvent, useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import WeamLogo from '../components/WeamLogo'
 import { useAuth } from '../contexts/AuthContext'
+import { useSettings } from '../contexts/SettingsContext'
 
 function errorMessage(error: unknown) {
   if (error instanceof AxiosError) {
@@ -16,7 +17,8 @@ function errorMessage(error: unknown) {
 }
 
 export default function LoginPage() {
-  const { user, login, loginWithGoogleCredential } = useAuth()
+  const { login, loginWithGoogleCredential } = useAuth()
+  const { t } = useSettings()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -24,7 +26,10 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (user) return <Navigate to="/dashboard" replace />
+  // Deliberately no "already logged in → redirect to dashboard" guard here:
+  // visiting /login while authenticated (e.g. to try a different demo
+  // account) should show the form, not silently bounce away before the new
+  // credentials can be submitted.
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -58,32 +63,30 @@ export default function LoginPage() {
         <div className="auth-scene">
           <img src="/prototype-girl.png" alt="طفلة ضمن الهوية البصرية لوئام" />
           <div className="auth-scene-copy">
-            <span>مرحبًا بعودتك 💛</span>
-            <h1>كل فريق الطفل في مساحة واحدة.</h1>
-            <p>تابعي التقارير والأهداف والجلسات والتحديثات من نقطة واحدة.</p>
+            <h1>{t('login.tagline')}</h1>
           </div>
         </div>
-        <small>نسخة المسابقة تستخدم بيانات تجريبية فقط.</small>
+        <small>{t('login.demoNote')}</small>
       </section>
 
       <section className="prototype-auth-form-wrap">
         <div className="prototype-auth-form">
           <div className="mobile-logo"><WeamLogo compact /></div>
-          <span className="soft-kicker">تسجيل الدخول</span>
-          <h2>أهلًا بك في وئام</h2>
-          <p className="muted auth-intro">أدخلي بيانات حسابك للمتابعة.</p>
+          <span className="soft-kicker">{t('login.kicker')}</span>
+          <h2>{t('login.title')}</h2>
+          <p className="muted auth-intro">{t('login.subtitle')}</p>
 
           <form className="form-stack" onSubmit={submit}>
-            <label>البريد الإلكتروني<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" /></label>
-            <label>كلمة المرور<input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" /></label>
+            <label>{t('login.email')}<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" /></label>
+            <label>{t('login.password')}<input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" /></label>
             {error && <div className="alert alert-error">{error}</div>}
-            <button className="btn btn-primary btn-block btn-large" disabled={submitting}>{submitting ? 'جاري الدخول...' : 'تسجيل الدخول'}</button>
+            <button className="btn btn-primary btn-block btn-large" disabled={submitting}>{submitting ? t('login.submitting') : t('login.submit')}</button>
           </form>
 
-          <div className="divider"><span>أو</span></div>
+          <div className="divider"><span>{t('login.or')}</span></div>
           <GoogleSignInButton onCredential={google} />
-          <p className="auth-switch">ما عندك حساب؟ <Link to="/register">إنشاء حساب جديد</Link></p>
-          <Link className="back-home-link" to="/">العودة إلى البداية</Link>
+          <p className="auth-switch">{t('login.noAccount')} <Link to="/register">{t('login.createOne')}</Link></p>
+          <Link className="back-home-link" to="/">{t('login.backHome')}</Link>
         </div>
       </section>
     </main>

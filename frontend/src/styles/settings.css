@@ -40,6 +40,9 @@
 .settings-text-scale-grid .settings-option { min-height: 88px; justify-content: center; }
 .settings-text-sample { font-weight: 900; color: inherit; line-height: 1; }
 
+.settings-option-grid.settings-language-grid { grid-template-columns: repeat(2, 1fr); max-width: 320px; }
+.settings-language-note { margin: 14px 0 0; color: var(--m9-muted); font-size: 12px; }
+
 @media (max-width: 560px) {
   .settings-account-grid { grid-template-columns: 1fr; }
   .settings-option-grid { grid-template-columns: 1fr 1fr; }

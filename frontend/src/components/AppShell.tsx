@@ -3,19 +3,20 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import WeamLogo from './WeamLogo'
 import { apiClient } from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import { useSettings } from '../contexts/SettingsContext'
 
-const roleLabels = {
-  guardian: 'ولي أمر',
-  care_provider: 'مقدم رعاية',
-  center: 'حساب مركز',
-  admin: 'إدارة وئام',
+const roleLabelKeys = {
+  guardian: 'role.guardian',
+  care_provider: 'role.provider',
+  center: 'role.center',
+  admin: 'role.admin',
 }
 
 type ShellIconName = 'home' | 'centers' | 'provider' | 'messages' | 'invitations' | 'notifications' | 'add' | 'admin' | 'menu' | 'close' | 'logout' | 'settings'
 
 type NavEntry = {
   to: string
-  label: string
+  labelKey: string
   icon: ShellIconName
   badge?: number
 }
@@ -36,15 +37,15 @@ function ShellIcon({ name }: { name: ShellIconName }) {
   return <svg {...common}><path d="M10 17l5-5-5-5M15 12H3" /><path d="M15 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" /></svg>
 }
 
-function pageTitle(pathname: string) {
-  if (pathname.startsWith('/admin')) return 'لوحة الإدارة'
+function pageTitle(pathname: string, t: (key: string) => string) {
+  if (pathname.startsWith('/admin')) return t('nav.admin')
   if (pathname.startsWith('/provider/center')) return 'إدارة ملف المركز'
-  if (pathname.startsWith('/provider')) return 'مساحة مقدم الخدمة'
+  if (pathname.startsWith('/provider')) return t('nav.provider')
   if (pathname.startsWith('/centers/')) return 'تفاصيل المركز'
-  if (pathname.startsWith('/centers')) return 'المراكز والخدمات'
-  if (pathname.startsWith('/messages') || pathname.includes('/communication')) return 'الرسائل'
-  if (pathname.startsWith('/notifications')) return 'التنبيهات'
-  if (pathname.startsWith('/invitations')) return 'الدعوات'
+  if (pathname.startsWith('/centers')) return t('nav.centers')
+  if (pathname.startsWith('/messages') || pathname.includes('/communication')) return t('nav.messages')
+  if (pathname.startsWith('/notifications')) return t('nav.notifications')
+  if (pathname.startsWith('/invitations')) return t('nav.invitations')
   if (pathname.includes('/center-matches')) return 'مطابقة المراكز'
   if (pathname.includes('/care-team')) return 'فريق الرعاية'
   if (pathname.includes('/reports')) return 'التقارير'
@@ -53,13 +54,14 @@ function pageTitle(pathname: string) {
   if (pathname.includes('/timeline')) return 'الخط الزمني'
   if (pathname.includes('/voice-notes')) return 'الملاحظات الصوتية'
   if (pathname.includes('/assistant')) return 'مساعد وئام'
-  if (pathname.startsWith('/children/new')) return 'إضافة طفل'
+  if (pathname.startsWith('/children/new')) return t('nav.addChild')
   if (pathname.startsWith('/children/')) return 'ملف الطفل'
-  return 'الرئيسية'
+  return t('nav.home')
 }
 
 export default function AppShell() {
   const { user, logout } = useAuth()
+  const { t } = useSettings()
   const navigate = useNavigate()
   const location = useLocation()
   const [unread, setUnread] = useState(0)
@@ -98,23 +100,25 @@ export default function AppShell() {
   const navEntries = useMemo<NavEntry[]>(() => {
     if (user?.role === 'admin') {
       return [
-        { to: '/admin', label: 'لوحة الإدارة', icon: 'admin' },
-        { to: '/notifications', label: 'التنبيهات', icon: 'notifications', badge: unread },
-        { to: '/settings', label: 'الإعدادات', icon: 'settings' },
+        { to: '/admin', labelKey: 'nav.admin', icon: 'admin' },
+        { to: '/notifications', labelKey: 'nav.notifications', icon: 'notifications', badge: unread },
+        { to: '/settings', labelKey: 'nav.settings', icon: 'settings' },
       ]
     }
     const entries: NavEntry[] = [
-      { to: '/dashboard', label: 'الرئيسية', icon: 'home' },
-      { to: '/centers', label: 'المراكز والخدمات', icon: 'centers' },
+      { to: '/dashboard', labelKey: 'nav.home', icon: 'home' },
+      { to: '/centers', labelKey: 'nav.centers', icon: 'centers' },
     ]
-    if (user?.role === 'care_provider' || user?.role === 'center') entries.push({ to: '/provider', label: 'مساحة مقدم الخدمة', icon: 'provider' })
+    if (user?.role === 'care_provider' || user?.role === 'center') entries.push({ to: '/provider', labelKey: 'nav.provider', icon: 'provider' })
     entries.push(
-      { to: '/messages', label: 'الرسائل', icon: 'messages', badge: chatUnread },
-      { to: '/invitations', label: 'الدعوات', icon: 'invitations' },
-      { to: '/notifications', label: 'التنبيهات', icon: 'notifications', badge: unread },
+      { to: '/messages', labelKey: 'nav.messages', icon: 'messages', badge: chatUnread },
+      { to: '/invitations', labelKey: 'nav.invitations', icon: 'invitations' },
     )
-    if (user?.role === 'guardian') entries.push({ to: '/children/new', label: 'إضافة طفل', icon: 'add' })
-    entries.push({ to: '/settings', label: 'الإعدادات', icon: 'settings' })
+    if (user?.role === 'guardian') entries.push({ to: '/children/new', labelKey: 'nav.addChild', icon: 'add' })
+    entries.push(
+      { to: '/notifications', labelKey: 'nav.notifications', icon: 'notifications', badge: unread },
+      { to: '/settings', labelKey: 'nav.settings', icon: 'settings' },
+    )
     return entries
   }, [chatUnread, unread, user?.role])
 
@@ -132,6 +136,7 @@ export default function AppShell() {
   }
 
   const initial = user?.full_name?.trim().slice(0, 1) || 'و'
+  const roleLabel = user ? t(roleLabelKeys[user.role]) : ''
 
   return (
     <div className="m9-app-shell">
@@ -144,32 +149,32 @@ export default function AppShell() {
         </div>
         <div className="m9-account-card">
           <span className="m9-account-avatar">{initial}</span>
-          <div><strong>{user?.full_name}</strong><small>{user ? roleLabels[user.role] : ''}</small></div>
+          <div><strong>{user?.full_name}</strong><small>{roleLabel}</small></div>
         </div>
         <nav className="m9-side-nav">
           {navEntries.map((entry) => (
             <NavLink key={entry.to} to={entry.to} className={({ isActive }) => isActive ? 'active' : undefined}>
               <span className="m9-nav-icon"><ShellIcon name={entry.icon} /></span>
-              <span>{entry.label}</span>
+              <span>{t(entry.labelKey)}</span>
               {Boolean(entry.badge) && <b>{entry.badge! > 99 ? '99+' : entry.badge}</b>}
             </NavLink>
           ))}
         </nav>
         <div className="m9-sidebar-spacer" />
-        <div className="m9-privacy-note"><strong>خصوصيتك أولويتنا</strong><span>لا يظهر المحتوى إلا لمن يملك صلاحية فعالة.</span></div>
-        <button className="m9-signout-button" type="button" onClick={signOut}><ShellIcon name="logout" /> تسجيل الخروج</button>
+        <div className="m9-privacy-note"><strong>{t('nav.privacyTitle')}</strong><span>{t('nav.privacyBody')}</span></div>
+        <button className="m9-signout-button" type="button" onClick={signOut}><ShellIcon name="logout" /> {t('nav.signOut')}</button>
       </aside>
 
       <div className="m9-app-main">
         <header className="m9-topbar">
           <button className="m9-menu-button" type="button" aria-label="فتح القائمة" onClick={() => setSidebarOpen(true)}><ShellIcon name="menu" /></button>
-          <div className="m9-topbar-title"><span>وئام</span><strong>{pageTitle(location.pathname)}</strong></div>
+          <div className="m9-topbar-title"><span>Weam</span><strong>{pageTitle(location.pathname, t)}</strong></div>
           <div className="m9-topbar-actions">
             <NavLink className="m9-topbar-notifications" to="/notifications" aria-label={`التنبيهات غير المقروءة ${unread}`}>
               <ShellIcon name="notifications" />
               {unread > 0 && <b>{unread > 99 ? '99+' : unread}</b>}
             </NavLink>
-            <div className="m9-topbar-profile"><span>{initial}</span><div><strong>{user?.full_name}</strong><small>{user ? roleLabels[user.role] : ''}</small></div></div>
+            <div className="m9-topbar-profile"><span>{initial}</span><div><strong>{user?.full_name}</strong><small>{roleLabel}</small></div></div>
           </div>
         </header>
         <main className="m9-page-wrap"><Outlet /></main>
@@ -179,7 +184,7 @@ export default function AppShell() {
         {mobileEntries.map((entry) => (
           <NavLink key={entry.to} to={entry.to} className={entry.icon === 'add' ? 'm9-mobile-primary' : undefined}>
             <span><ShellIcon name={entry.icon} />{Boolean(entry.badge) && <b>{entry.badge! > 9 ? '9+' : entry.badge}</b>}</span>
-            <small>{entry.label === 'المراكز والخدمات' ? 'المراكز' : entry.label}</small>
+            <small>{entry.icon === 'centers' ? t('nav.centers').split(' ')[0] : t(entry.labelKey)}</small>
           </NavLink>
         ))}
       </nav>

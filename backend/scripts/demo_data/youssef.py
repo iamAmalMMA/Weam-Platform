@@ -25,6 +25,9 @@ from app.services.follow_up_notifications import follow_up_source_id
 from .shared import (
     SeedContext,
     add_audit_log,
+    add_care_team_member,
+    add_goal,
+    add_voice_note,
     date_days_ago,
     date_days_from_now,
     days_ago,
@@ -44,6 +47,9 @@ def build(ctx: SeedContext) -> Child:
     guardian = ctx.guardian
     secondary_guardian = ctx.secondary_guardian
     pt = ctx.specialists["pt"]
+    ot = ctx.specialists["ot"]
+    behavioral = ctx.specialists["behavioral"]
+    teacher = ctx.specialists["teacher_youssef"]
 
     child = Child(created_by_user_id=guardian.id, external_ref=EXTERNAL_REF,
                   created_at=days_ago(now, 71), updated_at=days_ago(now, 1))
@@ -80,6 +86,27 @@ def build(ctx: SeedContext) -> Child:
         access_status=AccessStatus.ACTIVE.value, accepted_at=days_ago(now, 37), created_at=days_ago(now, 37),
     ))
     db.flush()
+
+    # --- Complete the care team: mobility case → physical therapy (above) +
+    # occupational therapy + behavioral support, plus the PE teacher ---------
+    add_care_team_member(
+        db, child=child, specialist=ot, guardian=guardian,
+        role_label="أخصائية علاج وظيفي",
+        permissions=["view_profile", "view_care_team", "view_reports", "upload_reports", "view_goals", "view_timeline", "message_team"],
+        now=now, invited_days_ago=32, accepted_days_ago=31,
+    )
+    add_care_team_member(
+        db, child=child, specialist=behavioral, guardian=guardian,
+        role_label="أخصائي نفسي سلوكي",
+        permissions=["view_profile", "view_care_team", "view_reports", "view_goals", "manage_goals", "view_timeline", "message_team"],
+        now=now, invited_days_ago=20, accepted_days_ago=19,
+    )
+    add_care_team_member(
+        db, child=child, specialist=teacher, guardian=guardian,
+        role_label="معلم تربية بدنية مساندة",
+        permissions=["view_profile", "view_care_team", "view_goals", "view_timeline", "message_team"],
+        now=now, invited_days_ago=15, accepted_days_ago=14,
+    )
 
     report_id, version_id = str(uuid.uuid4()), str(uuid.uuid4())
     report_created = days_ago(now, 30)
@@ -148,6 +175,14 @@ def build(ctx: SeedContext) -> Child:
                    entity_type="goal", entity_id=goal2.id, created_at=days_ago(now, 5),
                    details={"title": goal2.title, "assigned_to_user_id": pt.id})
 
+    add_goal(
+        db, child=child, title="تحسين التآزر الحركي الدقيق أثناء الأنشطة الصفية",
+        description="دعم وظيفي للتحكم بالأدوات المدرسية الصغيرة أثناء الأنشطة.",
+        category="علاج وظيفي", progress_percent=25, assigned_to=ot, created_by=ot,
+        now=now, start_days_ago=18, update_note="تحسن بسيط في الإمساك بالقلم أثناء الجلسات.",
+        update_days_ago=6,
+    )
+
     voice_note_id = str(uuid.uuid4())
     voice_stored = upload_voice_wav(ctx, child_id=child.id, voice_note_id=voice_note_id)
     db.add(VoiceNote(id=voice_note_id, child_id=child.id, title="ملاحظة من الأب بعد نشاط في الحديقة",
@@ -159,6 +194,13 @@ def build(ctx: SeedContext) -> Child:
                       transcript_language="ar", stt_provider="seeded_demo", stt_model="weam-demo-v1",
                       created_by_user_id=secondary_guardian.id, reviewed_by_user_id=guardian.id,
                       reviewed_at=days_ago(now, 4), created_at=days_ago(now, 4), updated_at=days_ago(now, 4)))
+
+    add_voice_note(
+        ctx, child=child, title="ملاحظة من المعلم بعد حصة التربية البدنية",
+        transcript_draft="يوسف شارك اليوم في اللعبة الجماعية وقدر يوقف بثبات أكثر من قبل.",
+        transcript_final="يوسف شارك اليوم في اللعبة الجماعية بحصة التربية البدنية، وأظهر ثباتًا أفضل أثناء الوقوف.",
+        created_by=teacher, now=now, days_ago_created=9,
+    )
 
     thread = AssistantThread(child_id=child.id, created_by_user_id=guardian.id, title="متابعة الدعم الحركي",
                               created_at=days_ago(now, 1), updated_at=days_ago(now, 1))

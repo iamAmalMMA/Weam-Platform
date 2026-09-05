@@ -17,6 +17,7 @@ from app.models.care_team import AccessAuditLog
 from app.models.center import Center
 from app.models.follow_up import NotificationReceipt
 from app.models.user import User
+from app.models.voice_note import VoiceNote
 from app.services.access import AccessGrant
 from app.services.security import hash_password
 from app.services.storage import LocalReportStorage, LocalVoiceStorage, StoredFile
@@ -148,6 +149,34 @@ def build_pool(db: Session, *, now: datetime) -> SeedContext:
         "ot": _get_or_create_user(
             db, email="ot@weam.demo", full_name="هند القحطاني", role=UserRole.CARE_PROVIDER.value,
             provider_specialty="علاج وظيفي",
+        ),
+        "audiologist": _get_or_create_user(
+            db, email="audiologist@weam.demo", full_name="ضحى الزهراني", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="سمعيات",
+        ),
+        "behavioral": _get_or_create_user(
+            db, email="behavioral@weam.demo", full_name="سلطان الغامدي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="تعديل سلوك",
+        ),
+        "psych_edu": _get_or_create_user(
+            db, email="psych.edu@weam.demo", full_name="لطيفة الشهري", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="نفسي تربوي",
+        ),
+        "teacher_lama": _get_or_create_user(
+            db, email="teacher.lama@weam.demo", full_name="ريم القرني", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلمة تربية خاصة",
+        ),
+        "teacher_youssef": _get_or_create_user(
+            db, email="teacher.youssef@weam.demo", full_name="بندر السبيعي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلم تربية بدنية مساندة",
+        ),
+        "teacher_rawan": _get_or_create_user(
+            db, email="teacher.rawan@weam.demo", full_name="نورة الحارثي", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلمة الصف",
+        ),
+        "teacher_omar": _get_or_create_user(
+            db, email="teacher.omar@weam.demo", full_name="فاطمة الدوسري", role=UserRole.CARE_PROVIDER.value,
+            provider_specialty="معلمة روضة",
         ),
     }
 
@@ -288,6 +317,76 @@ def add_audit_log(db: Session, *, child_id: str, actor_user_id: str, action: str
     db.add(log)
     db.flush()
     return log
+
+
+def add_care_team_member(db: Session, *, child, specialist: User, guardian: User, role_label: str,
+                          permissions: list[str], now: datetime, invited_days_ago: int,
+                          accepted_days_ago: int) -> None:
+    """Add an accepted invitation + active membership pair for one specialist —
+    the concise version of the invite/accept pattern each journey repeats."""
+    from app.models.care_team import CareInvitation, CareTeamMembership
+
+    existing = db.scalar(
+        select(CareTeamMembership).where(
+            CareTeamMembership.child_id == child.id,
+            CareTeamMembership.user_id == specialist.id,
+        )
+    )
+    if existing:
+        return
+    invitation_created = days_ago(now, invited_days_ago)
+    db.add(CareInvitation(
+        child_id=child.id, invited_by_user_id=guardian.id, email=specialist.email,
+        target_role="care_provider", role_label=role_label, permissions=permissions,
+        status="accepted", invitation_expires_at=days_from_now(invitation_created, 14),
+        created_at=invitation_created, responded_at=days_ago(now, accepted_days_ago),
+    ))
+    db.add(CareTeamMembership(
+        child_id=child.id, user_id=specialist.id, invited_by_user_id=guardian.id,
+        role_label=role_label, permissions=permissions, access_status="active",
+        accepted_at=days_ago(now, accepted_days_ago), created_at=days_ago(now, accepted_days_ago),
+    ))
+    db.flush()
+
+
+def add_goal(db: Session, *, child, title: str, description: str, category: str,
+             progress_percent: int, assigned_to: User, created_by: User, now: datetime,
+             start_days_ago: int, update_note: str, update_days_ago: int) -> None:
+    """Concise extra-goal helper — same shape as each journey's inline goals."""
+    from app.models.goal import Goal, GoalUpdate
+
+    status = "completed" if progress_percent >= 100 else "in_progress"
+    goal = Goal(
+        child_id=child.id, title=title, description=description, category=category,
+        status=status, progress_percent=progress_percent,
+        start_date=date_days_ago(now, start_days_ago),
+        target_date=date_days_from_now(now, 30) if status != "completed" else date_days_ago(now, 5),
+        assigned_to_user_id=assigned_to.id, created_by_user_id=created_by.id,
+        created_at=days_ago(now, start_days_ago),
+    )
+    db.add(goal)
+    db.flush()
+    db.add(GoalUpdate(goal_id=goal.id, actor_user_id=assigned_to.id, note=update_note,
+                       progress_percent=progress_percent, status=status,
+                       created_at=days_ago(now, update_days_ago)))
+
+
+def add_voice_note(ctx: "SeedContext", *, child, title: str, transcript_draft: str,
+                    transcript_final: str, created_by: User, now: datetime, days_ago_created: int) -> None:
+    """Concise extra-voice-note helper — reuses the one shared demo .wav asset,
+    same as every journey's existing voice note (only the transcript differs)."""
+    voice_note_id = str(uuid.uuid4())
+    voice_stored = upload_voice_wav(ctx, child_id=child.id, voice_note_id=voice_note_id)
+    ctx.db.add(VoiceNote(
+        id=voice_note_id, child_id=child.id, title=title,
+        original_filename="demo_voice_sample.wav", content_type=voice_stored.content_type,
+        storage_key=voice_stored.key, size_bytes=voice_stored.size_bytes, sha256=voice_stored.sha256,
+        duration_seconds=2, transcription_status="completed", review_status="approved",
+        transcript_draft=transcript_draft, transcript_final=transcript_final, transcript_language="ar",
+        stt_provider="seeded_demo", stt_model="weam-demo-v1", created_by_user_id=created_by.id,
+        reviewed_by_user_id=created_by.id, reviewed_at=days_ago(now, days_ago_created),
+        created_at=days_ago(now, days_ago_created), updated_at=days_ago(now, days_ago_created),
+    ))
 
 
 def ensure_favorite(db: Session, *, user_id: str, center_id: str, created_at: datetime) -> None:

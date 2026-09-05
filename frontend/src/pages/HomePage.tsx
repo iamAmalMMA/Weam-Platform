@@ -2,9 +2,11 @@ import { Link, Navigate } from 'react-router-dom'
 import WeamConnector from '../components/WeamConnector'
 import WeamLogo from '../components/WeamLogo'
 import { useAuth } from '../contexts/AuthContext'
+import { useSettings } from '../contexts/SettingsContext'
 
 export default function HomePage() {
   const { user, loading } = useAuth()
+  const { t } = useSettings()
   if (!loading && user) return <Navigate to="/dashboard" replace />
 
   return (
@@ -16,24 +18,20 @@ export default function HomePage() {
       <header className="welcome-nav">
         <WeamLogo to="/" compact />
         <div className="welcome-nav-actions">
-          <Link className="btn btn-outline" to="/login">تسجيل الدخول</Link>
-          <Link className="btn btn-primary" to="/register">إنشاء حساب</Link>
+          <Link className="btn btn-outline" to="/login">{t('nav.login')}</Link>
+          <Link className="btn btn-primary" to="/register">{t('nav.register')}</Link>
         </div>
       </header>
 
       <section className="welcome-hero">
         <div className="welcome-copy">
-          <span className="soft-kicker">منصة واحدة لفريق الطفل كله</span>
-          <h1>رحلة طفلك تستحق أن تُرى <span>كاملة.</span></h1>
-          <p>
-            تجمع وئام الأسرة والمختصين والمعلمين والمراكز حول سجل رعاية موحد،
-            حتى تصل المعلومة الصحيحة للشخص الصحيح في الوقت المناسب.
-          </p>
+          <span className="soft-kicker">{t('home.kicker')}</span>
+          <h1>{t('home.h1.part1')} <span>{t('home.h1.part2')}</span></h1>
           <div className="welcome-actions">
-            <Link className="btn btn-primary btn-large" to="/register">إنشاء حساب جديد</Link>
-            <Link className="btn btn-white btn-large" to="/login">تسجيل الدخول</Link>
+            <Link className="btn btn-primary btn-large" to="/register">{t('home.cta.register')}</Link>
+            <Link className="btn btn-white btn-large" to="/login">{t('home.cta.login')}</Link>
           </div>
-          <div className="privacy-pill">🛡️ بيانات آمنة ومحمية • ولي الأمر يتحكم بالصلاحيات</div>
+          <div className="privacy-pill">{t('home.privacy')}</div>
         </div>
 
         <div className="welcome-art" aria-label="واجهة مستوحاة من بروتوتايب وئام">
@@ -45,9 +43,9 @@ export default function HomePage() {
       </section>
 
       <section className="welcome-benefits">
-        <article><span>📄</span><strong>تقارير موحدة</strong><small>كل تحديث في مكان واحد</small></article>
-        <article><span>🎯</span><strong>أهداف واضحة</strong><small>متابعة تقدم الطفل باستمرار</small></article>
-        <article><span>👥</span><strong>فريق مترابط</strong><small>بصلاحيات يتحكم بها ولي الأمر</small></article>
+        <article><span>📄</span><strong>{t('home.benefit.reports')}</strong></article>
+        <article><span>🎯</span><strong>{t('home.benefit.goals')}</strong></article>
+        <article><span>👥</span><strong>{t('home.benefit.team')}</strong></article>
       </section>
     </main>
   )
