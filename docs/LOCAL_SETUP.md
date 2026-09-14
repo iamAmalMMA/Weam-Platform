@@ -56,18 +56,11 @@ All three refuse to run against `WEAM_ENVIRONMENT=production` unless you set
 refuse to run unless the database is already at the latest Alembic revision. See
 [`docs/SEED_DATA_ARCHITECTURE.md`](SEED_DATA_ARCHITECTURE.md) for the full design.
 
-Demo accounts (same password for all: `WeamDemo123!`):
-| Role | Email |
-|---|---|
-| Primary guardian (all four children) | `guardian@weam.demo` |
-| Secondary guardian (Youssef only) | `guardian2@weam.demo` |
-| Speech & language specialist | `slp@weam.demo` |
-| Physical/rehabilitation specialist | `pt@weam.demo` |
-| Educational specialist | `edu@weam.demo` |
-| Occupational therapist | `ot@weam.demo` |
-| Center representative | `center@weam.demo` |
+For the full demo account list (14 accounts covering every role — guardian, specialists,
+teachers, center — all sharing the password `WeamDemo123!`), see the root
+[`README.md`](../README.md#login--demo-accounts). These are local competition-demo
+credentials only — see the "Important data rule" below.
 
-These are local competition-demo credentials only — see the "Important data rule" below.
 The first admin account is provisioned separately and securely; see the root
 [`README.md`](../README.md#create-the-first-admin-securely).
 

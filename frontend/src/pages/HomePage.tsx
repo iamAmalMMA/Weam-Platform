@@ -36,7 +36,7 @@ export default function HomePage() {
 
         <div className="welcome-art" aria-label="واجهة مستوحاة من بروتوتايب وئام">
           <div className="scene-frame">
-            <img src="/prototype-girl.png" alt="طفلة ضمن الهوية البصرية لبروتوتايب وئام" />
+            <img src="/hero-family.jpg" alt="ولي أمر وفريق الرعاية يلتفّون حول طفلة ضمن منصة وئام" />
             <div className="scene-wash" />
           </div>
         </div>

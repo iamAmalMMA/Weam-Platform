@@ -61,7 +61,7 @@ export default function LoginPage() {
       <section className="prototype-auth-visual">
         <WeamLogo to="/" light />
         <div className="auth-scene">
-          <img src="/prototype-girl.png" alt="طفلة ضمن الهوية البصرية لوئام" />
+          <img src="/hero-family.jpg" alt="ولي أمر وفريق الرعاية يلتفّون حول طفلة ضمن منصة وئام" />
           <div className="auth-scene-copy">
             <h1>{t('login.tagline')}</h1>
           </div>
