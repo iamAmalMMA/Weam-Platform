@@ -291,6 +291,102 @@ input:focus, textarea:focus, select:focus { border-color: var(--m9-primary-brigh
   border-color: var(--m9-line);
 }
 
+/* .welcome-hero is a plain layout section, not a card — the [class*="hero"]
+   catch-all above only meant to reach the app's dashboard/profile "hero"
+   banners, but its name match also sweeps this one in. Undo it here so the
+   homepage keeps the same borderless look in dark mode as in light mode. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .welcome-hero {
+    background: none;
+    border: none;
+  }
+}
+:root[data-theme="dark"] .welcome-hero {
+  background: none;
+  border: none;
+}
+
+/* The hero illustration's glow is a light lavender/mint halo, tuned for a
+   light background — on dark it still shows as a stray light patch no
+   matter the color, so drop it entirely in dark mode. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .art-glow {
+    display: none;
+  }
+}
+:root[data-theme="dark"] .art-glow {
+  display: none;
+}
+
+/* The homepage's decorative sky-bubble blobs are colored for the light
+   background too (a pale mint) and show up as flat grey boxes on dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sky-bubble {
+    display: none;
+  }
+}
+:root[data-theme="dark"] .sky-bubble {
+  display: none;
+}
+
+/* Same story for every hardcoded-white decorative circle tucked into a
+   "hero" card corner (child profile, goals/timeline, reports) — invisible
+   texture on a light card, a bright grey smudge on a dark one. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .prototype-child-hero::before,
+  :root:not([data-theme="light"]) .prototype-child-hero::after,
+  :root:not([data-theme="light"]) .m1-feature-hero::after,
+  :root:not([data-theme="light"]) .reports-hero::after {
+    display: none;
+  }
+}
+:root[data-theme="dark"] .prototype-child-hero::before,
+:root[data-theme="dark"] .prototype-child-hero::after,
+:root[data-theme="dark"] .m1-feature-hero::after,
+:root[data-theme="dark"] .reports-hero::after {
+  display: none;
+}
+
+/* Cream "heads up" note boxes (voice notes, AI assistant) and the admin
+   "unverified" badge are hardcoded to a light gold tint with no dark
+   counterpart — same dark-gold tokens the rest of the app already uses. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .voice-dev-note,
+  :root:not([data-theme="light"]) .assistant-safety-note {
+    background: var(--m9-gold-soft);
+    border-color: transparent;
+  }
+  :root:not([data-theme="light"]) .voice-dev-note strong,
+  :root:not([data-theme="light"]) .assistant-safety-note strong {
+    color: var(--m9-gold);
+  }
+  :root:not([data-theme="light"]) .voice-dev-note p,
+  :root:not([data-theme="light"]) .assistant-safety-note p {
+    color: var(--m9-muted);
+  }
+  :root:not([data-theme="light"]) .admin-state.unverified {
+    background: var(--m9-gold-soft);
+    color: var(--m9-gold);
+  }
+}
+:root[data-theme="dark"] .voice-dev-note,
+:root[data-theme="dark"] .assistant-safety-note {
+  background: var(--m9-gold-soft);
+  border-color: transparent;
+}
+:root[data-theme="dark"] .voice-dev-note strong,
+:root[data-theme="dark"] .assistant-safety-note strong {
+  color: var(--m9-gold);
+}
+:root[data-theme="dark"] .voice-dev-note p,
+:root[data-theme="dark"] .assistant-safety-note p {
+  color: var(--m9-muted);
+}
+:root[data-theme="dark"] .admin-state.unverified {
+  background: var(--m9-gold-soft);
+  color: var(--m9-gold);
+}
+
 /* Headings inside those cards also had hardcoded dark-navy text, invisible
    against the dark background above. */
 @media (prefers-color-scheme: dark) {
