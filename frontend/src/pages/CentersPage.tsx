@@ -44,14 +44,6 @@ function ageLabel(center: Center) {
   return `حتى ${center.max_age_years} سنة`
 }
 
-function sourceLabel(center: Center) {
-  if (center.source_type !== 'public_research' || !center.last_reviewed_at) return null
-  const date = new Date(center.last_reviewed_at).toLocaleDateString('ar-SA-u-ca-gregory', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  })
-  return `مصادر عامة · جرى الاطلاع عليها في ${date}`
-}
-
 // Straight-line (haversine) distance in km — approximate, not a driving distance.
 function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371
@@ -207,15 +199,6 @@ export default function CentersPage() {
         <span className="centers-hero-mark" aria-hidden="true">⌖</span>
       </div>
 
-      <div className="centers-demo-note">
-        <span aria-hidden="true">i</span>
-        <p>
-          تعتمد معلومات المراكز على مصادر عامة جرى الاطلاع عليها في التاريخ الموضح لكل مركز، أو على بيانات تجريبية
-          بالكامل لأغراض العرض في هذه النسخة. يُنصح بالتواصل مع المركز مباشرة للتأكد من توفر الخدمة وتحديث التفاصيل.
-          الظهور في الدليل لا يعني وجود شراكة أو اعتماد من وئام.
-        </p>
-      </div>
-
       <div className="centers-location-bar">
         {userLocation ? (
           <span className="centers-location-active">✓ يتم عرض المسافة التقريبية من موقعك الحالي</span>
@@ -297,7 +280,6 @@ export default function CentersPage() {
                 <span>{deliveryLabels(center).join(' • ')}</span>
                 <span>{ageLabel(center)}</span>
               </div>
-              {sourceLabel(center) && <p className="center-card-source">{sourceLabel(center)}</p>}
               {distanceLabel(center, userLocation) && (
                 <p className="center-card-distance">{distanceLabel(center, userLocation)}</p>
               )}

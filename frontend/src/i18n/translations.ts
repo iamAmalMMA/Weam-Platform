@@ -9,8 +9,9 @@ type Dict = Record<string, { ar: string; en: string }>
 export const translations: Dict = {
   // HomePage
   'home.kicker': { ar: 'منصة واحدة لفريق الطفل كله', en: 'One platform for the whole care team' },
-  'home.h1.part1': { ar: 'رحلة طفلك تستحق أن تُرى', en: "Your child's journey deserves to be seen" },
-  'home.h1.part2': { ar: 'كاملة.', en: 'fully.' },
+  'home.h1.part1': { ar: 'رحلة طفلك تستحق أن', en: "Your child's journey deserves" },
+  'home.h1.part2': { ar: 'تُرى', en: 'to be seen' },
+  'home.h1.part3': { ar: 'كاملة', en: 'fully' },
   'home.cta.register': { ar: 'إنشاء حساب جديد', en: 'Create account' },
   'home.cta.login': { ar: 'تسجيل الدخول', en: 'Sign in' },
   'home.privacy': { ar: '🛡️ بيانات آمنة ومحمية • ولي الأمر يتحكم بالصلاحيات', en: '🛡️ Private by design • guardians control access' },

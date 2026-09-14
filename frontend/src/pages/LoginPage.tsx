@@ -1,7 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
-import GoogleSignInButton from '../components/GoogleSignInButton'
 import WeamLogo from '../components/WeamLogo'
 import { useAuth } from '../contexts/AuthContext'
 import { useSettings } from '../contexts/SettingsContext'
@@ -17,7 +16,7 @@ function errorMessage(error: unknown) {
 }
 
 export default function LoginPage() {
-  const { login, loginWithGoogleCredential } = useAuth()
+  const { login } = useAuth()
   const { t } = useSettings()
   const navigate = useNavigate()
   const location = useLocation()
@@ -46,27 +45,14 @@ export default function LoginPage() {
     }
   }
 
-  const google = async (credential: string) => {
-    setError('')
-    try {
-      await loginWithGoogleCredential(credential)
-      navigate('/dashboard', { replace: true })
-    } catch (err) {
-      setError(errorMessage(err))
-    }
-  }
-
   return (
     <main className="prototype-auth-page">
       <section className="prototype-auth-visual">
-        <WeamLogo to="/" light />
+        <WeamLogo to="/" />
         <div className="auth-scene">
-          <img src="/hero-family.jpg" alt="ولي أمر وفريق الرعاية يلتفّون حول طفلة ضمن منصة وئام" />
-          <div className="auth-scene-copy">
-            <h1>{t('login.tagline')}</h1>
-          </div>
+          <div className="auth-scene-glow" />
+          <img src="/weam-family.webp" alt="ولي أمر وفريق الرعاية يلتفّون حول طفلة ضمن منصة وئام" />
         </div>
-        <small>{t('login.demoNote')}</small>
       </section>
 
       <section className="prototype-auth-form-wrap">
@@ -83,8 +69,6 @@ export default function LoginPage() {
             <button className="btn btn-primary btn-block btn-large" disabled={submitting}>{submitting ? t('login.submitting') : t('login.submit')}</button>
           </form>
 
-          <div className="divider"><span>{t('login.or')}</span></div>
-          <GoogleSignInButton onCredential={google} />
           <p className="auth-switch">{t('login.noAccount')} <Link to="/register">{t('login.createOne')}</Link></p>
           <Link className="back-home-link" to="/">{t('login.backHome')}</Link>
         </div>

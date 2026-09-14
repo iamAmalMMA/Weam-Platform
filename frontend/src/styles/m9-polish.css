@@ -474,21 +474,20 @@ input:focus, textarea:focus, select:focus { border-color: var(--m9-primary-brigh
 .prototype-role-card { border-color: var(--m9-line); border-radius: 17px; }
 .prototype-role-card:hover { box-shadow: var(--m9-shadow); }
 .prototype-auth-form-wrap { background:var(--m9-surface); }
-.prototype-auth-visual { background: linear-gradient(150deg, #4338ca, #7a6fd6 76%, #eed27a 145%); }
-.auth-scene { border-radius: 28px; }
 .welcome-page { background-color: #f7faf9; background-image: linear-gradient(180deg, #fbfefd 0%, #f2f8f6 100%); }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .welcome-page {
     background-color: var(--m9-bg);
     background-image: linear-gradient(180deg, #17162e 0%, var(--m9-bg) 100%);
   }
+  :root:not([data-theme="light"]) .prototype-auth-visual { color: var(--ink); }
 }
 :root[data-theme="dark"] .welcome-page {
   background-color: var(--m9-bg);
   background-image: linear-gradient(180deg, #17162e 0%, var(--m9-bg) 100%);
 }
+:root[data-theme="dark"] .prototype-auth-visual { color: var(--ink); }
 .welcome-hero { min-height: 600px; }
-.scene-frame { border-radius: 28px; box-shadow: var(--m9-shadow-hover); }
 .welcome-benefits article { border-color: var(--m9-line); border-radius: 18px; box-shadow: var(--m9-shadow); }
 
 @media (max-width: 1180px) {
