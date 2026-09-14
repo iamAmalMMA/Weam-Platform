@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { translate, type Language } from '../i18n/translations'
 
-export type ThemeMode = 'system' | 'light' | 'dark'
+export type ThemeMode = 'light' | 'dark'
 export type TextScale = 'normal' | 'large' | 'xlarge'
 export type { Language }
 
@@ -29,7 +29,7 @@ const SettingsContext = createContext<SettingsContextValue | undefined>(undefine
 
 function readTheme(): ThemeMode {
   const stored = localStorage.getItem(THEME_KEY)
-  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
+  return stored === 'light' || stored === 'dark' ? stored : 'light'
 }
 
 function readTextScale(): TextScale {
@@ -48,9 +48,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(readLanguage)
 
   useEffect(() => {
-    const root = document.documentElement
-    if (theme === 'system') root.removeAttribute('data-theme')
-    else root.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem(THEME_KEY, theme)
   }, [theme])
 

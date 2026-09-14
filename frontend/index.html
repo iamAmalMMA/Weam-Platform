@@ -14,7 +14,7 @@
       (function () {
         try {
           var theme = localStorage.getItem('weam_theme')
-          if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme)
+          document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light')
           var scale = localStorage.getItem('weam_text_scale')
           var zoom = scale === 'large' ? '1.22' : scale === 'xlarge' ? '1.38' : '1.08'
           document.documentElement.style.setProperty('--a11y-zoom', zoom)

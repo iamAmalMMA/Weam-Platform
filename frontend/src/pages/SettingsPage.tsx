@@ -5,7 +5,6 @@ import '../styles/settings.css'
 const THEME_OPTIONS: { value: ThemeMode; labelKey: string; hintKey: string; icon: string }[] = [
   { value: 'light', labelKey: 'settings.theme.light', hintKey: 'settings.theme.lightHint', icon: '☀️' },
   { value: 'dark', labelKey: 'settings.theme.dark', hintKey: 'settings.theme.darkHint', icon: '🌙' },
-  { value: 'system', labelKey: 'settings.theme.system', hintKey: 'settings.theme.systemHint', icon: '🖥️' },
 ]
 
 const TEXT_SCALE_OPTIONS: { value: TextScale; labelKey: string; sample: string }[] = [
