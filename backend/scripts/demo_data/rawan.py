@@ -119,7 +119,7 @@ def build(ctx: SeedContext) -> Child:
     stored = upload_report_pdf(ctx, child_id=child.id, report_id=report_id, version_id=version_id,
                                 asset_filename="rawan_learning_report.pdf")
     db.add(Report(id=report_id, child_id=child.id, title="تقرير دعم تعليمي", report_type="دعم تعليمي",
-                   report_date=date_days_ago(now, 25), source_label="مركز رواق للدعم التعليمي (تجريبي)",
+                   report_date=date_days_ago(now, 25), source_label="مركز رواق للدعم التعليمي",
                    visibility="care_team", created_by_user_id=edu.id, created_at=report_created, updated_at=report_created))
     db.add(ReportVersion(id=version_id, report_id=report_id, version_number=1,
                           original_filename="rawan_learning_report.pdf", content_type=stored.content_type,
@@ -145,7 +145,7 @@ def build(ctx: SeedContext) -> Child:
             "source_language": "ar",
             "evidence": ["تركيز جيد خلال المهام القصيرة المقسّمة إلى خطوات واضحة.",
                          "استجابة إيجابية لجدول يومي منظم بصريًا."],
-            "limitations": ["هذا تحليل تجريبي مُعدّ مسبقًا لأغراض العرض، وليس نتيجة تحليل حي — راجعيه قبل الاعتماد عليه."],
+            "limitations": ["هذا التحليل مُعدّ آليًا لاستخلاص أهم النقاط — راجعيه قبل الاعتماد عليه رسميًا ضمن خطة الرعاية."],
             "safety_note": "هذا تلخيص مساعد وليس تشخيصًا أو خطة علاجية بديلة عن المختص.",
         },
         created_by_user_id=guardian.id, reviewed_by_user_id=edu.id, reviewed_at=days_ago(now, 24),

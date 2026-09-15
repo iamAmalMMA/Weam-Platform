@@ -11,14 +11,6 @@ function ageLabel(center: Center) {
   return `حتى ${center.max_age_years} سنة`
 }
 
-function sourceLabel(center: Center) {
-  if (center.source_type !== 'public_research' || !center.last_reviewed_at) return null
-  const date = new Date(center.last_reviewed_at).toLocaleDateString('ar-SA-u-ca-gregory', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  })
-  return `مصادر عامة · جرى الاطلاع عليها في ${date}`
-}
-
 export default function CenterDetailsPage() {
   const { centerId } = useParams<{ centerId: string }>()
   const [center, setCenter] = useState<Center | null>(null)
@@ -79,16 +71,6 @@ export default function CenterDetailsPage() {
         <button type="button" className={`center-detail-favorite ${center.is_favorite ? 'active' : ''}`} onClick={() => void toggleFavorite()} disabled={saving} aria-pressed={center.is_favorite}>
           <span aria-hidden="true">{center.is_favorite ? '♥' : '♡'}</span>{center.is_favorite ? 'محفوظ في المفضلة' : 'حفظ في المفضلة'}
         </button>
-      </div>
-
-      <div className="centers-demo-note compact">
-        <span aria-hidden="true">i</span>
-        <p>
-          تعتمد معلومات المركز على مصادر عامة جرى الاطلاع عليها في التاريخ الموضح، أو على بيانات تجريبية بالكامل
-          لأغراض العرض. يُنصح بالتواصل مع المركز مباشرة للتأكد من توفر الخدمة وتحديث التفاصيل. الظهور في الدليل
-          لا يعني وجود شراكة أو اعتماد من وئام.
-          {sourceLabel(center) && <><br /><strong>{sourceLabel(center)}</strong></>}
-        </p>
       </div>
 
       <div className="center-detail-grid">

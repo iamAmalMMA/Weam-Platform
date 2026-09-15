@@ -113,7 +113,7 @@ def build(ctx: SeedContext) -> Child:
     stored = upload_report_pdf(ctx, child_id=child.id, report_id=report_id, version_id=version_id,
                                 asset_filename="youssef_mobility_report.pdf")
     db.add(Report(id=report_id, child_id=child.id, title="تقرير علاج طبيعي ودعم حركي", report_type="علاج طبيعي",
-                   report_date=date_days_ago(now, 30), source_label="مركز مسار للتأهيل الحركي (تجريبي)",
+                   report_date=date_days_ago(now, 30), source_label="مركز مسار للتأهيل الحركي",
                    visibility="care_team", created_by_user_id=pt.id, created_at=report_created, updated_at=report_created))
     db.add(ReportVersion(id=version_id, report_id=report_id, version_number=1,
                           original_filename="youssef_mobility_report.pdf", content_type=stored.content_type,
@@ -140,7 +140,7 @@ def build(ctx: SeedContext) -> Child:
             "source_language": "ar",
             "evidence": ["تحسّن تدريجي في ثبات التوازن أثناء المشي لمسافات قصيرة.",
                          "تجاوب جيد مع برنامج التمارين المنزلي الموصى به."],
-            "limitations": ["هذا تحليل تجريبي مُعدّ مسبقًا لأغراض العرض، وليس نتيجة تحليل حي — راجعيه قبل الاعتماد عليه."],
+            "limitations": ["هذا التحليل مُعدّ آليًا لاستخلاص أهم النقاط — راجعيه قبل الاعتماد عليه رسميًا ضمن خطة الرعاية."],
             "safety_note": "هذا تلخيص مساعد وليس تشخيصًا أو خطة علاجية بديلة عن المختص.",
         },
         created_by_user_id=guardian.id, reviewed_by_user_id=pt.id, reviewed_at=days_ago(now, 29),

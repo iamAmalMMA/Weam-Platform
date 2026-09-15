@@ -98,9 +98,9 @@ def build_pool(db: Session) -> GhaidaaPool:
     )
     hearing_center = _get_or_create_center(
         db,
-        name="مركز تجريبي للسمعيات والتخاطب",
+        name="مركز نبض للسمعيات والتخاطب",
         city="الرياض",
-        description="مركز تجريبي (بيانات اصطناعية) لخدمات السمعيات والنطق والتخاطب.",
+        description="مركز متخصص في خدمات السمعيات والنطق والتخاطب.",
         services=["سمعيات", "نطق وتخاطب", "متابعة سمعية"],
         specialties=["ضعف سمع", "اضطرابات النطق واللغة"],
         served_needs=["دعم التواصل", "متابعة سمعية", "تنسيق المتابعات"],
@@ -195,7 +195,7 @@ def build(db: Session, *, now) -> Child:
                 "summary": summary, "key_findings": key_findings, "needs": needs,
                 "recommendations": recommendations, "follow_up_actions": follow_up_actions,
                 "goal_mentions": goal_mentions, "source_language": "ar", "evidence": key_findings[:2],
-                "limitations": ["هذا تحليل تجريبي مُعدّ مسبقًا لأغراض العرض، وليس نتيجة تحليل حي — راجعيه قبل الاعتماد عليه."],
+                "limitations": ["هذا التحليل مُعدّ آليًا لاستخلاص أهم النقاط — راجعيه قبل الاعتماد عليه رسميًا ضمن خطة الرعاية."],
                 "safety_note": "هذا تلخيص مساعد وليس تشخيصًا أو خطة علاجية بديلة عن المختص.",
             },
             created_by_user_id=guardian.id, reviewed_by_user_id=created_by.id,
@@ -206,7 +206,7 @@ def build(db: Session, *, now) -> Child:
 
     audiology_report_id, audiology_fu = make_report(
         title="تقرير سمعيات", report_type="سمعيات",
-        source_label="مركز نبض للسمعيات والتخاطب (تجريبي)", created_by=audiologist, days_ago_n=13,
+        source_label="مركز نبض للسمعيات والتخاطب", created_by=audiologist, days_ago_n=13,
         asset="taleyah_audiology_report.pdf",
         summary="استخدام منتظم للمعين السمعي مع استجابة جيدة في البيئة الهادئة، وصعوبة عند ارتفاع الضوضاء المحيطة.",
         key_findings=["استخدام المعين السمعي بانتظام مع استجابة جيدة في البيئة الهادئة.",
@@ -221,7 +221,7 @@ def build(db: Session, *, now) -> Child:
     )
     speech_report_id, speech_fu = make_report(
         title="تقرير نطق وتخاطب", report_type="نطق وتخاطب",
-        source_label="مركز نبض للسمعيات والتخاطب (تجريبي)", created_by=slp, days_ago_n=6,
+        source_label="مركز نبض للسمعيات والتخاطب", created_by=slp, days_ago_n=6,
         asset="taleyah_speech_report.pdf",
         summary="توسّع ملحوظ في المفردات المستخدمة تلقائيًا، مع حاجة لتبسيط التعليمات الشفوية الطويلة.",
         key_findings=["توسّع ملحوظ في المفردات المستخدمة تلقائيًا خلال المحادثة الحرة.",
@@ -235,7 +235,7 @@ def build(db: Session, *, now) -> Child:
     )
     behavior_report_id, behavior_fu = make_report(
         title="تقرير سلوكي وتقييم انتباه", report_type="تعديل سلوك",
-        source_label="مركز نبض للسمعيات والتخاطب (تجريبي)", created_by=behavioral, days_ago_n=2,
+        source_label="مركز نبض للسمعيات والتخاطب", created_by=behavioral, days_ago_n=2,
         asset="taleyah_behavior_report.pdf",
         summary="مدة انتباه قصيرة نسبيًا في المهام الطويلة، مع تحسّن واضح عند تقسيمها إلى خطوات صغيرة ومكافآت فورية.",
         key_findings=["مدة انتباه قصيرة نسبيًا أثناء المهام الطويلة، مع تحسّن عند تقسيمها لخطوات صغيرة.",

@@ -34,7 +34,6 @@ export const translations: Dict = {
   'login.createOne': { ar: 'إنشاء حساب جديد', en: 'Create one' },
   'login.backHome': { ar: 'العودة إلى البداية', en: 'Back to home' },
   'login.tagline': { ar: 'كل فريق الطفل في مساحة واحدة.', en: "Your child's whole team, in one place." },
-  'login.demoNote': { ar: 'نسخة المسابقة تستخدم بيانات تجريبية فقط.', en: 'This hackathon build uses demo data only.' },
 
   // RegisterPage
   'register.haveAccount': { ar: 'لديك حساب؟', en: 'Already have an account?' },
