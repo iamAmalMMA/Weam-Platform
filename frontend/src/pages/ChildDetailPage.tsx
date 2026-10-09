@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import ChildProgressCharts from '../components/ChildProgressCharts'
@@ -15,6 +15,17 @@ type ChildDraft = {
   needs: string[]
   support_requirements: string[]
   services: string[]
+}
+
+type FeatureTone = 'blue' | 'violet' | 'teal' | 'rose' | 'gold'
+
+type FeatureLink = {
+  label: string
+  description: string
+  to: string
+  allowed: boolean
+  icon: string
+  tone: FeatureTone
 }
 
 const emptyDraft: ChildDraft = {
@@ -57,15 +68,6 @@ function Tags({ items, empty = 'غير مضافة' }: { items: string[]; empty?:
   return <div className="detail-tags">{items.map((item) => <span key={item}>{item}</span>)}</div>
 }
 
-function ProfileSection({ title, description, items, tone }: { title: string; description: string; items: string[]; tone: string }) {
-  return (
-    <div className={`m9-profile-data-row ${tone}`}>
-      <div><strong>{title}</strong><small>{description}</small></div>
-      <Tags items={items} />
-    </div>
-  )
-}
-
 export default function ChildDetailPage() {
   const { childId } = useParams()
   const [child, setChild] = useState<ChildProfile | null>(null)
@@ -75,6 +77,8 @@ export default function ChildDetailPage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
+  const editPanelRef = useRef<HTMLFormElement | null>(null)
 
   useEffect(() => {
     apiClient.get<ChildProfile>(`/children/${childId}`)
@@ -102,16 +106,16 @@ export default function ChildDetailPage() {
   const highlights = Array.from(new Set([...child.needs, ...child.conditions, ...child.services])).slice(0, 3)
   const allCareFieldsEmpty = !child.conditions.length && !child.needs.length && !child.support_requirements.length && !child.services.length
 
-  const featureLinks = [
-    { label: 'التقارير', shortLabel: 'التقارير', to: `/children/${child.id}/reports`, allowed: canViewReports, icon: '▤' },
-    { label: 'الأهداف', shortLabel: 'الأهداف', to: `/children/${child.id}/goals`, allowed: canViewGoals, icon: '◎' },
-    { label: 'المتابعات', shortLabel: 'المتابعات', to: `/children/${child.id}/follow-ups`, allowed: canViewTimeline, icon: '✓' },
-    { label: 'الملاحظات الصوتية', shortLabel: 'الملاحظات الصوتية', to: `/children/${child.id}/voice-notes`, allowed: canViewVoice, icon: '◉' },
-    { label: 'الخط الزمني', shortLabel: 'الخط الزمني', to: `/children/${child.id}/timeline`, allowed: canViewTimeline, icon: '↻' },
-    { label: 'فريق الرعاية', shortLabel: 'فريق الرعاية', to: `/children/${child.id}/care-team`, allowed: canViewCareTeam, icon: '♧' },
-    { label: 'التواصل', shortLabel: 'التواصل', to: `/children/${child.id}/communication`, allowed: canMessageTeam, icon: '◇' },
-    { label: 'مساعد وئام', shortLabel: 'مساعد وئام', to: `/children/${child.id}/assistant`, allowed: true, icon: '✦' },
-    { label: 'مراكز مناسبة', shortLabel: 'المراكز', to: `/children/${child.id}/center-matches`, allowed: true, icon: '⌖' },
+  const featureLinks: FeatureLink[] = [
+    { label: 'التقارير', description: 'تقارير الطفل وتحليلها', to: `/children/${child.id}/reports`, allowed: canViewReports, icon: '▤', tone: 'blue' },
+    { label: 'الأهداف', description: 'خطط وأهداف التقدم', to: `/children/${child.id}/goals`, allowed: canViewGoals, icon: '◎', tone: 'violet' },
+    { label: 'المتابعات', description: 'المهام والمواعيد القادمة', to: `/children/${child.id}/follow-ups`, allowed: canViewTimeline, icon: '✓', tone: 'teal' },
+    { label: 'الملاحظات الصوتية', description: 'تسجيل وتحويل إلى نص', to: `/children/${child.id}/voice-notes`, allowed: canViewVoice, icon: '◉', tone: 'rose' },
+    { label: 'فريق الرعاية', description: 'الأعضاء والأدوار والصلاحيات', to: `/children/${child.id}/care-team`, allowed: canViewCareTeam, icon: '♧', tone: 'violet' },
+    { label: 'الرسائل', description: 'تواصل آمن مع الفريق', to: `/children/${child.id}/communication`, allowed: canMessageTeam, icon: '◇', tone: 'blue' },
+    { label: 'مساعد وئام', description: 'أسئلة من بيانات الطفل', to: `/children/${child.id}/assistant`, allowed: true, icon: '✦', tone: 'gold' },
+    { label: 'الخط الزمني', description: 'سجل موحد لأهم التحديثات', to: `/children/${child.id}/timeline`, allowed: canViewTimeline, icon: '↻', tone: 'teal' },
+    { label: 'مراكز مناسبة', description: 'مراكز وخدمات تناسب احتياجات الطفل', to: `/children/${child.id}/center-matches`, allowed: true, icon: '⌖', tone: 'rose' },
   ]
 
   const cancelEditing = () => {
@@ -119,6 +123,19 @@ export default function ChildDetailPage() {
     setSaveError('')
     setSaved(false)
     setEditing(false)
+  }
+
+  const startEditing = () => {
+    setInfoOpen(false)
+    setSaved(false)
+    setEditing(true)
+    window.setTimeout(() => {
+      const panel = editPanelRef.current
+      if (!panel) return
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const firstField = panel.querySelector<HTMLElement>('input, textarea, select')
+      firstField?.focus({ preventScroll: true })
+    }, 80)
   }
 
   const saveProfile = async (event: FormEvent) => {
@@ -150,10 +167,11 @@ export default function ChildDetailPage() {
   }
 
   return (
-    <section className="prototype-detail-page m9-child-profile-page">
-      <header className="m9-child-page-heading">
-        <div><span className="soft-kicker">مساحة ولي الأمر</span><h1>ملف {displayName}</h1><p>صورة واضحة ومختصرة للاحتياجات والخدمات وخطوات الرعاية.</p></div>
+    <section className="prototype-detail-page m9-child-profile-page m10-child-profile-page">
+      <header className="m9-child-page-heading m10-child-page-heading">
+        <div><span className="soft-kicker">ملف الطفل</span><h1>ملف {displayName}</h1><p>نظرة سريعة على الطفل، ثم وصول مباشر إلى خدمات ملفه.</p></div>
         <div className="m9-child-heading-actions">
+          <button type="button" className="btn btn-outline" onClick={() => setInfoOpen(true)}>معلومات الطفل</button>
           {canViewCareTeam && <Link className="btn btn-outline" to={`/children/${child.id}/care-team`}>فريق الرعاية</Link>}
           {canViewReports && <Link className="btn btn-primary" to={`/children/${child.id}/reports`}>إضافة تقرير</Link>}
         </div>
@@ -161,11 +179,10 @@ export default function ChildDetailPage() {
 
       {saved && <div className="alert m9-save-success">تم تحديث معلومات الطفل بنجاح.</div>}
 
-      <div className="m9-child-profile-hero">
+      <div className="m9-child-profile-hero m10-child-profile-hero">
         <div className="m9-child-profile-identity">
           <div className="m9-child-profile-avatar"><span>{child.first_name.slice(0, 1)}</span></div>
           <div className="m9-child-profile-copy">
-            <span className="status-pill success">ملف رعاية نشط</span>
             <h2>{displayName}</h2>
             <p>{displayAge(child.birth_date)} · {displayGender(child.gender)} · آخر تحديث {new Date(child.updated_at).toLocaleDateString('ar-SA-u-ca-gregory')}</p>
             <div className="m9-child-highlights">
@@ -173,23 +190,35 @@ export default function ChildDetailPage() {
             </div>
           </div>
         </div>
-        <div className="m9-profile-status" aria-label="حالة ملف الرعاية">
-          <span aria-hidden="true">✓</span>
-          <div><strong>ملف الرعاية</strong><small>{allCareFieldsEmpty ? 'بانتظار استكمال المعلومات' : 'المعلومات متاحة للفريق'}</small></div>
-        </div>
+        <button type="button" className="m10-profile-info-button" onClick={() => setInfoOpen(true)}>
+          <span aria-hidden="true">i</span>
+          <div><strong>معلومات الطفل</strong><small>البيانات الأساسية والنبذة</small></div>
+        </button>
       </div>
-
-      <nav className="m9-child-feature-tabs" aria-label="أقسام ملف الطفل">
-        <Link className="active" to={`/children/${child.id}`}><span>⌂</span>نظرة عامة</Link>
-        {featureLinks.map((item) => item.allowed
-          ? <Link key={item.to} to={item.to}><span>{item.icon}</span>{item.shortLabel}</Link>
-          : <span key={item.to} className="disabled" title={`${item.label} غير مصرح`}><i>{item.icon}</i>{item.shortLabel}</span>)}
-      </nav>
 
       <ChildProgressCharts childId={child.id} canViewGoals={canViewGoals} canViewFollowUps={canViewTimeline} />
 
+      <section className="m10-child-services-section" aria-labelledby="child-services-title">
+        <div className="m10-section-heading">
+          <div><span className="soft-kicker">الوصول السريع</span><h2 id="child-services-title">خدمات ملف الطفل</h2><p>اختاري الخدمة المطلوبة للوصول مباشرة إلى تفاصيلها.</p></div>
+        </div>
+        <div className="m10-child-services-grid">
+          {featureLinks.map((item) => item.allowed ? (
+            <Link key={item.to} to={item.to} className={`m10-service-card ${item.tone}`}>
+              <span className="m10-service-icon" aria-hidden="true">{item.icon}</span>
+              <div><strong>{item.label}</strong><small>{item.description}</small></div>
+            </Link>
+          ) : (
+            <div key={item.to} className={`m10-service-card disabled ${item.tone}`} title={`${item.label} غير مصرح`}>
+              <span className="m10-service-icon" aria-hidden="true">{item.icon}</span>
+              <div><strong>{item.label}</strong><small>غير متاح حسب الصلاحية</small></div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {editing && primary && (
-        <form className="m9-child-edit-panel" onSubmit={saveProfile}>
+        <form ref={editPanelRef} className="m9-child-edit-panel" onSubmit={saveProfile}>
           <div className="m9-child-edit-heading"><div><span className="soft-kicker">تحديث الملف</span><h2>معلومات الطفل واحتياجاته</h2><p>هذه المعلومات تساعد فريق الرعاية ومساعد وئام ومطابقة المراكز.</p></div><button type="button" className="btn btn-white btn-small" onClick={cancelEditing}>إلغاء</button></div>
           {saveError && <div className="alert alert-error">{saveError}</div>}
           <div className="form-grid two">
@@ -209,34 +238,56 @@ export default function ChildDetailPage() {
         </form>
       )}
 
-      <div className="m9-child-overview-grid">
-        <article className="m9-care-profile-card">
-          <div className="m9-overview-card-heading">
-            <div><span className="soft-kicker">نبذة الملف</span><h2>الاحتياجات والرعاية الحالية</h2><p>معلومات عملية يستخدمها الفريق لفهم حالة الطفل وطريقة دعمه.</p></div>
-            {primary && <button type="button" className="m9-edit-profile-button" aria-expanded={editing} onClick={() => { setEditing((value) => !value); setSaved(false) }}>{editing ? 'إغلاق التعديل' : 'تحديث المعلومات'}</button>}
-          </div>
-          {allCareFieldsEmpty && <div className="m9-care-empty-callout"><strong>لم تكتمل معلومات الرعاية بعد</strong><span>أضيفي الحالة والاحتياجات والخدمات حتى تصبح المطابقة وإجابات المساعد أكثر دقة.</span>{primary && !editing && <button type="button" onClick={() => setEditing(true)}>استكمال المعلومات</button>}</div>}
-          <div className="m9-profile-data-list">
-            <ProfileSection title="الحالة" description="التشخيص أو الحالة المعروفة" items={child.conditions} tone="mint" />
-            <ProfileSection title="الاحتياجات" description="المهارات والجوانب التي تحتاج دعمًا" items={child.needs} tone="pink" />
-            <ProfileSection title="متطلبات الدعم" description="الأسلوب أو البيئة المناسبة للطفل" items={child.support_requirements} tone="gold" />
-            <ProfileSection title="الخدمات الحالية" description="الخدمات التي يتلقاها الطفل الآن" items={child.services} tone="violet" />
-          </div>
-        </article>
+      <article className="m9-care-profile-card m10-care-summary-card">
+        <div className="m9-overview-card-heading m10-care-heading">
+          <div><h2>الاحتياجات والرعاية الحالية</h2><p>ملخص سريع لفهم ما يحتاجه الطفل وطريقة دعمه والخدمات التي يتلقاها الآن.</p></div>
+          {primary && <button type="button" className="m9-edit-profile-button" aria-expanded={editing} onClick={() => { if (editing) cancelEditing(); else startEditing() }}>{editing ? 'إغلاق التعديل' : 'تحديث المعلومات'}</button>}
+        </div>
 
-        <aside className="m9-child-info-card">
-          <div><span className="soft-kicker">معلومات الملف</span><h2>بيانات أساسية</h2></div>
-          <dl>
-            <div><dt>تاريخ الميلاد</dt><dd>{child.birth_date ? new Date(`${child.birth_date}T00:00:00`).toLocaleDateString('ar-SA-u-ca-gregory') : 'غير مضاف'}</dd></div>
-            <div><dt>الجنس</dt><dd>{displayGender(child.gender)}</dd></div>
-            <div><dt>صفة الوصول</dt><dd>{accessLabel}</dd></div>
-            <div><dt>الخدمات الحالية</dt><dd>{child.services.length ? `${new Intl.NumberFormat('ar-SA').format(child.services.length)} خدمات` : 'لا توجد خدمات مضافة'}</dd></div>
-          </dl>
-          {child.summary && <div className="m9-child-summary"><strong>نبذة عن الطفل</strong><p>{child.summary}</p></div>}
-        </aside>
-      </div>
+        {allCareFieldsEmpty ? (
+          <div className="m9-care-empty-callout"><strong>لم تكتمل معلومات الرعاية بعد</strong><span>أضيفي الحالة والاحتياجات والخدمات حتى تصبح المطابقة وإجابات المساعد أكثر دقة.</span>{primary && !editing && <button type="button" onClick={startEditing}>استكمال المعلومات</button>}</div>
+        ) : (
+          <div className="m10-care-overview-grid">
+            <div className="m10-care-overview-item mint">
+              <div className="m10-care-overview-title"><span aria-hidden="true" /><div><strong>الحالة</strong><small>التشخيص أو الحالة المعروفة</small></div></div>
+              <Tags items={child.conditions} />
+            </div>
+            <div className="m10-care-overview-item pink">
+              <div className="m10-care-overview-title"><span aria-hidden="true" /><div><strong>الاحتياجات</strong><small>المهارات والجوانب التي تحتاج دعمًا</small></div></div>
+              <Tags items={child.needs} />
+            </div>
+            <div className="m10-care-overview-item gold">
+              <div className="m10-care-overview-title"><span aria-hidden="true" /><div><strong>متطلبات الدعم</strong><small>الأسلوب أو البيئة المناسبة للطفل</small></div></div>
+              <Tags items={child.support_requirements} />
+            </div>
+            <div className="m10-care-overview-item violet">
+              <div className="m10-care-overview-title"><span aria-hidden="true" /><div><strong>الخدمات الحالية</strong><small>الخدمات التي يتلقاها الطفل الآن</small></div></div>
+              <Tags items={child.services} />
+            </div>
+          </div>
+        )}
+      </article>
 
       <div className="prototype-next-banner m9-child-next-step"><div><span className="soft-kicker">المتابعات</span><h2>المواعيد المهمة تبقى قريبة منك</h2><p>تظهر المتابعات في ملف الطفل والخط الزمني، ويذكّرك وئام بها عند اقتراب موعدها.</p></div>{canViewTimeline ? <Link className="btn btn-white" to={`/children/${child.id}/follow-ups`}>عرض المتابعات</Link> : <span>🔔</span>}</div>
+
+      {infoOpen && (
+        <div className="m10-info-modal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setInfoOpen(false) }}>
+          <section className="m10-info-modal-card" role="dialog" aria-modal="true" aria-labelledby="child-info-title">
+            <div className="m10-info-modal-head">
+              <div><span className="soft-kicker">معلومات الملف</span><h2 id="child-info-title">معلومات {displayName}</h2></div>
+              <button type="button" aria-label="إغلاق" onClick={() => setInfoOpen(false)}>×</button>
+            </div>
+            <dl className="m10-info-list">
+              <div><dt>تاريخ الميلاد</dt><dd>{child.birth_date ? new Date(`${child.birth_date}T00:00:00`).toLocaleDateString('ar-SA-u-ca-gregory') : 'غير مضاف'}</dd></div>
+              <div><dt>الجنس</dt><dd>{displayGender(child.gender)}</dd></div>
+              <div><dt>صفة الوصول</dt><dd>{accessLabel}</dd></div>
+              <div><dt>الخدمات الحالية</dt><dd>{child.services.length ? `${new Intl.NumberFormat('ar-SA').format(child.services.length)} خدمات` : 'لا توجد خدمات مضافة'}</dd></div>
+            </dl>
+            {child.summary && <div className="m9-child-summary"><strong>نبذة عن الطفل</strong><p>{child.summary}</p></div>}
+            {primary && <div className="m10-info-modal-actions"><button type="button" className="btn btn-primary" onClick={startEditing}>تحديث معلومات الطفل</button></div>}
+          </section>
+        </div>
+      )}
     </section>
   )
 }

@@ -52,9 +52,6 @@ export default function TimelinePage() {
     <section className="m1-feature-page">
       <div className="m1-feature-hero timeline-hero">
         <div>
-          <div className="m1-breadcrumb-row">
-            <Link className="m1-back-link" to={child ? `/children/${child.id}` : '/dashboard'}>← العودة إلى ملف الطفل</Link>
-          </div>
           <span className="soft-kicker m1-feature-kicker">الخط الزمني</span>
           <h1>رحلة {child?.preferred_name || child?.first_name || 'الطفل'}</h1>
           <p>من إنشاء الملف إلى انضمام الفريق والتقارير وتقدم الأهداف والمتابعات؛ كل تحديث مهم يبقى واضحًا ومرتبطًا بصاحبه وتاريخه.</p>

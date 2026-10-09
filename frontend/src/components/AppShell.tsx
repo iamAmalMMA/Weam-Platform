@@ -48,6 +48,7 @@ function pageTitle(pathname: string, t: (key: string) => string) {
   if (pathname.startsWith('/invitations')) return t('nav.invitations')
   if (pathname.includes('/center-matches')) return 'مطابقة المراكز'
   if (pathname.includes('/care-team')) return 'فريق الرعاية'
+  if (/^\/reports\/[^/]+\/ai$/.test(pathname)) return 'تحليل التقرير'
   if (pathname.includes('/reports')) return 'التقارير'
   if (pathname.includes('/goals')) return 'الأهداف'
   if (pathname.includes('/follow-ups')) return 'المتابعات'
@@ -97,6 +98,10 @@ export default function AppShell() {
 
   useEffect(() => setSidebarOpen(false), [location.pathname])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [location.pathname])
+
   const navEntries = useMemo<NavEntry[]>(() => {
     if (user?.role === 'admin') {
       return [
@@ -114,7 +119,6 @@ export default function AppShell() {
       { to: '/messages', labelKey: 'nav.messages', icon: 'messages', badge: chatUnread },
       { to: '/invitations', labelKey: 'nav.invitations', icon: 'invitations' },
     )
-    if (user?.role === 'guardian') entries.push({ to: '/children/new', labelKey: 'nav.addChild', icon: 'add' })
     entries.push(
       { to: '/notifications', labelKey: 'nav.notifications', icon: 'notifications', badge: unread },
       { to: '/settings', labelKey: 'nav.settings', icon: 'settings' },
@@ -125,7 +129,7 @@ export default function AppShell() {
   const mobileEntries = useMemo(() => {
     if (user?.role === 'admin') return navEntries
     const preferred = user?.role === 'guardian'
-      ? ['/dashboard', '/centers', '/children/new', '/messages', '/notifications']
+      ? ['/dashboard', '/centers', '/messages', '/notifications']
       : ['/dashboard', '/centers', '/provider', '/messages', '/notifications']
     return preferred.map((to) => navEntries.find((entry) => entry.to === to)).filter((entry): entry is NavEntry => Boolean(entry))
   }, [navEntries, user?.role])
@@ -137,6 +141,18 @@ export default function AppShell() {
 
   const initial = user?.full_name?.trim().slice(0, 1) || 'و'
   const roleLabel = user ? t(roleLabelKeys[user.role]) : ''
+  const childRouteMatch = location.pathname.match(/^\/children\/([^/]+)(?:\/.*)?$/)
+  const childRouteId = childRouteMatch?.[1]
+  const reportAnalysisRoute = /^\/reports\/[^/]+\/ai$/.test(location.pathname)
+  const contextBackTarget = childRouteId
+    ? (childRouteId === 'new' || location.pathname === `/children/${childRouteId}` ? '/dashboard' : `/children/${childRouteId}`)
+    : reportAnalysisRoute ? '__history__' : ''
+
+  const goBack = () => {
+    if (!contextBackTarget) return
+    if (contextBackTarget === '__history__') navigate(-1)
+    else navigate(contextBackTarget)
+  }
 
   return (
     <div className="m9-app-shell">
@@ -160,15 +176,26 @@ export default function AppShell() {
             </NavLink>
           ))}
         </nav>
-        <div className="m9-sidebar-spacer" />
-        <div className="m9-privacy-note"><strong>{t('nav.privacyTitle')}</strong><span>{t('nav.privacyBody')}</span></div>
-        <button className="m9-signout-button" type="button" onClick={signOut}><ShellIcon name="logout" /> {t('nav.signOut')}</button>
+        <div className="m9-sidebar-footer">
+          <div className="m9-privacy-note"><strong>{t('nav.privacyTitle')}</strong><span>{t('nav.privacyBody')}</span></div>
+          <button className="m9-signout-button" type="button" onClick={signOut}><ShellIcon name="logout" /> {t('nav.signOut')}</button>
+        </div>
       </aside>
 
       <div className="m9-app-main">
-        <header className="m9-topbar">
-          <button className="m9-menu-button" type="button" aria-label="فتح القائمة" onClick={() => setSidebarOpen(true)}><ShellIcon name="menu" /></button>
-          <div className="m9-topbar-title"><span>Weam</span><strong>{pageTitle(location.pathname, t)}</strong></div>
+        <header className={`m9-topbar ${contextBackTarget ? 'm10-has-context-back' : ''}`}>
+          <div className="m10-topbar-leading">
+            <button className="m9-menu-button" type="button" aria-label="فتح القائمة" onClick={() => setSidebarOpen(true)}><ShellIcon name="menu" /></button>
+            {contextBackTarget && (
+              <button className="m10-context-back" type="button" onClick={goBack} aria-label="الرجوع">
+                <span className="m10-context-back-label">رجوع</span>
+                <svg className="m10-context-back-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
+          <div className="m9-topbar-title"><strong>{pageTitle(location.pathname, t)}</strong></div>
           <div className="m9-topbar-actions">
             <NavLink className="m9-topbar-notifications" to="/notifications" aria-label={`التنبيهات غير المقروءة ${unread}`}>
               <ShellIcon name="notifications" />

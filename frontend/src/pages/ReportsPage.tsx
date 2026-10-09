@@ -191,7 +191,6 @@ export default function ReportsPage() {
     <section className="reports-page">
       <div className="reports-hero">
         <div>
-          <Link className="reports-back" to={`/children/${child.id}`}>← العودة إلى ملف الطفل</Link>
           <span className="soft-kicker">التقارير والوثائق</span>
           <h1>تقارير {child.preferred_name || child.first_name}</h1>
           <p>كل تقرير محفوظ بنسخه السابقة وصلاحياته، ليبقى فريق الرعاية على نفس الصورة.</p>

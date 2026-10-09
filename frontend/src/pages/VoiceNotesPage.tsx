@@ -279,9 +279,6 @@ export default function VoiceNotesPage() {
     <section className="voice-page">
       <div className="voice-hero">
         <div>
-          <Link to={`/children/${child.id}`} className="voice-back">
-            ← العودة إلى ملف الطفل
-          </Link>
           <span className="soft-kicker">الملاحظات الصوتية</span>
           <h1>ملاحظات {child.preferred_name || child.first_name} الصوتية</h1>
           <p>

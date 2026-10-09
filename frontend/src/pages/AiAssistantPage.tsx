@@ -251,7 +251,6 @@ export default function AiAssistantPage() {
     <section className="assistant-page">
       <div className="assistant-hero">
         <div>
-          <Link className="assistant-back" to={`/children/${child.id}`}>← العودة إلى ملف الطفل</Link>
           <span className="soft-kicker">مساعد وئام</span>
           <h1>مساعد وئام لـ {child.preferred_name || child.first_name}</h1>
           <p>اسألي عن التقارير، الأهداف، الاحتياجات أو الملاحظات المعتمدة. كل إجابة تُظهر مصادرها ولا تستخدم معلومات خارج ملف الطفل.</p>

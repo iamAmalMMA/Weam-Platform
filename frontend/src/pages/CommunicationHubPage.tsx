@@ -252,7 +252,6 @@ export default function CommunicationHubPage() {
     <section className="communication-page">
       <div className="communication-heading">
         <div>
-          <Link className="communication-back" to={`/children/${child.id}`}>← العودة لملف الطفل</Link>
           <span className="soft-kicker">تواصل فريق الرعاية</span>
           <h1>فريق {child.preferred_name || child.first_name} في مكان واحد</h1>
           <p>رسائل ومرفقات وعناصر مشتركة بين أعضاء الفريق المصرح لهم فقط.</p>

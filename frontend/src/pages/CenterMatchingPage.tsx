@@ -87,8 +87,6 @@ export default function CenterMatchingPage() {
 
   return (
     <section className="matching-page">
-      <Link className="matching-back" to={`/children/${child.id}`}>← العودة إلى ملف {child.preferred_name || child.first_name}</Link>
-
       <div className="matching-hero">
         <div>
           <span className="soft-kicker">مطابقة المراكز</span>

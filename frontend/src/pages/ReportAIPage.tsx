@@ -180,9 +180,6 @@ export default function ReportAIPage() {
     <section className="ai-report-page">
       <div className="ai-report-hero">
         <div>
-          <Link className="ai-report-back" to={`/children/${report.child_id}/reports`}>
-            ← العودة إلى التقارير
-          </Link>
           <span className="soft-kicker">تحليل التقرير</span>
           <h1>فهم أسرع لـ {report.title}</h1>
           <p>
