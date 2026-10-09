@@ -205,7 +205,6 @@ export default function FollowUpsPage() {
     <section className="m3-page">
       <div className="m3-hero">
         <div>
-          <Link className="m3-back" to={child ? `/children/${child.id}` : '/dashboard'}>← العودة إلى ملف الطفل</Link>
           <span className="soft-kicker">المتابعات</span>
           <h1>كل موعد مهم في مكان واحد</h1>
           <p>

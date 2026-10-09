@@ -162,11 +162,9 @@ input:focus, textarea:focus, select:focus { border-color: var(--m9-primary-brigh
 
 .m9-app-main { min-height: 100vh; margin-right: 272px; }
 .m9-topbar {
-  /* Not position:sticky — combined with the html-level zoom used for the
-     accessibility text-size setting, sticky triggers a Chromium repaint bug
-     that ghosts the header on scroll. */
-  position: relative;
-  z-index: 35;
+  position: sticky;
+  top: 0;
+  z-index: 60;
   min-height: 78px;
   padding: 12px clamp(20px, 3vw, 44px);
   display: flex;
@@ -174,8 +172,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--m9-primary-brigh
   justify-content: space-between;
   gap: 20px;
   border-bottom: 1px solid var(--m9-line);
-  background: color-mix(in srgb, var(--m9-surface-muted) 91%, transparent);
-  backdrop-filter: blur(16px);
+  background: var(--m9-surface-muted);
+  box-shadow: 0 5px 18px rgba(38, 32, 76, .05);
 }
 
 .m9-topbar-title { display: grid; gap: 3px; }
@@ -814,6 +812,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--m9-primary-brigh
 .m9-child-feature-tabs > span.disabled i { color: #b9c2c4; }
 
 .m9-child-edit-panel {
+  scroll-margin-top: 98px;
   padding: clamp(21px, 3vw, 31px);
   display: grid;
   gap: 22px;
@@ -1001,4 +1000,494 @@ input:focus, textarea:focus, select:focus { border-color: var(--m9-primary-brigh
   --m9-coral-soft: #3a1620;
   --m9-shadow: 0 14px 38px rgba(0, 0, 0, .4);
   --m9-shadow-hover: 0 18px 44px rgba(0, 0, 0, .5);
+}
+
+/* M10 — UI-only navigation refinement for child files and child services. */
+.m10-topbar-leading { display: flex; align-items: center; gap: 9px; }
+.m10-context-back {
+  min-height: 43px;
+  padding: 0 14px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+  border: 1px solid var(--m9-line);
+  border-radius: 13px;
+  background: var(--m9-surface);
+  color: var(--m9-ink);
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 6px 18px rgba(67, 56, 202, .045);
+  cursor: pointer;
+}
+.m10-context-back:hover { border-color: #d5d0ee; color: var(--m9-primary); background: var(--m9-primary-soft); }
+.m10-context-back-icon {
+  width: 18px;
+  height: 22px;
+  flex: 0 0 auto;
+  color: var(--m9-primary);
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.m10-context-back-label { direction: rtl; }
+
+/* Guardian home: child files are the primary content. */
+.m10-children-dashboard { max-width: 1060px; margin-inline: auto; }
+.m10-files-heading {
+  padding: 4px 3px 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.m10-files-heading h1 { margin: 5px 0 7px; color: var(--m9-ink); font-size: clamp(30px, 3.2vw, 44px); letter-spacing: -.025em; }
+.m10-files-heading p { max-width: 720px; margin: 0; color: var(--m9-copy); line-height: 1.8; }
+.m10-child-file-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.m10-child-file-card {
+  min-height: 150px;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--m9-line);
+  border-radius: 24px;
+  background: var(--m9-surface);
+  color: inherit;
+  box-shadow: var(--m9-shadow);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.m10-child-file-card:hover { transform: translateY(-2px); border-color: #d2cdec; box-shadow: var(--m9-shadow-hover); }
+.m10-child-file-avatar {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dcd7f3;
+  border-radius: 23px;
+  background: var(--m9-violet-soft);
+  color: var(--m9-violet);
+  font-size: 29px;
+  font-weight: 900;
+}
+.m10-child-file-copy { min-width: 0; }
+.m10-child-file-label { color: var(--m9-primary); font-size: 10px; font-weight: 900; }
+.m10-child-file-copy h2 { margin: 5px 0 9px; color: var(--m9-ink); font-size: 24px; }
+.m10-child-file-meta { display: flex; flex-wrap: wrap; gap: 7px 18px; color: var(--m9-muted); font-size: 11px; }
+.m10-child-file-chevron {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--m9-primary-soft);
+  color: var(--m9-primary);
+  font-size: 19px;
+  font-weight: 900;
+  transition: .18s ease;
+}
+.m10-child-file-card:hover .m10-child-file-chevron { background: var(--m9-primary); color: #fff; }
+
+/* Child profile: compact overview first, then visible service cards. */
+.m10-child-profile-page { gap: 18px; }
+.m10-child-page-heading { padding-bottom: 0; }
+.m10-child-profile-hero {
+  min-height: 0;
+  padding: 20px 22px;
+  border-radius: 22px;
+}
+.m10-child-profile-hero .m9-child-profile-avatar { width: 82px; height: 82px; border-width: 6px; border-radius: 25px; }
+.m10-child-profile-hero .m9-child-profile-avatar span { font-size: 31px; }
+.m10-child-profile-hero .m9-child-profile-copy h2 { margin: 6px 0 5px; font-size: clamp(27px, 3vw, 37px); }
+.m10-child-profile-hero .m9-child-highlights { margin-top: 10px; }
+.m10-profile-info-button {
+  min-width: 190px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--m9-line);
+  border-radius: 15px;
+  background: var(--m9-surface);
+  color: var(--m9-ink);
+  text-align: right;
+  cursor: pointer;
+}
+.m10-profile-info-button > span {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 35px;
+  border-radius: 11px;
+  background: var(--m9-primary-soft);
+  color: var(--m9-primary);
+  font-size: 15px;
+  font-weight: 900;
+}
+.m10-profile-info-button strong, .m10-profile-info-button small { display: block; }
+.m10-profile-info-button strong { font-size: 11px; }
+.m10-profile-info-button small { margin-top: 3px; color: var(--m9-muted); font-size: 9px; }
+
+.m10-child-services-section {
+  padding: 21px;
+  border: 1px solid var(--m9-line);
+  border-radius: 23px;
+  background: var(--m9-surface-muted);
+}
+.m10-section-heading { margin-bottom: 15px; }
+.m10-section-heading h2 { margin: 5px 0 4px; color: var(--m9-ink); font-size: 22px; }
+.m10-section-heading p { margin: 0; color: var(--m9-copy); font-size: 11px; }
+.m10-child-services-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.m10-service-card {
+  min-height: 138px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid var(--m9-line);
+  border-radius: 18px;
+  background: var(--m9-surface);
+  color: inherit;
+  box-shadow: 0 7px 22px rgba(67, 56, 202, .04);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.m10-service-card:hover { transform: translateY(-2px); border-color: #d3ceec; box-shadow: var(--m9-shadow); }
+.m10-service-card.disabled { opacity: .58; cursor: not-allowed; }
+.m10-service-card.disabled:hover { transform: none; border-color: var(--m9-line); box-shadow: 0 7px 22px rgba(67, 56, 202, .04); }
+.m10-service-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  font-size: 19px;
+  font-weight: 900;
+}
+.m10-service-card > div { min-width: 0; display: grid; gap: 5px; }
+.m10-service-card strong { color: var(--m9-ink); font-size: 14px; }
+.m10-service-card small { color: var(--m9-muted); font-size: 10px; line-height: 1.55; }
+.m10-service-card.blue .m10-service-icon { background: #eaf3ff; color: #347fd0; }
+.m10-service-card.violet .m10-service-icon { background: var(--m9-violet-soft); color: var(--m9-violet); }
+.m10-service-card.teal .m10-service-icon { background: var(--m9-teal-soft); color: var(--m9-teal); }
+.m10-service-card.rose .m10-service-icon { background: #fcecf2; color: #c75b86; }
+.m10-service-card.gold .m10-service-icon { background: var(--m9-gold-soft); color: var(--m9-gold); }
+
+/* Current care stays in the overview, but compact by default. */
+.m10-care-summary-card { padding: 22px; }
+.m10-care-heading { margin-bottom: 15px; }
+.m10-care-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.m10-care-compact-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.m10-care-compact-grid > div { min-height: 88px; padding: 12px; border: 1px solid var(--m9-line); border-radius: 15px; background: var(--m9-surface-muted); }
+.m10-care-compact-grid > div > span { display: block; margin-bottom: 8px; color: var(--m9-muted); font-size: 9px; font-weight: 800; }
+.m10-care-compact-grid .detail-tags { gap: 5px; }
+.m10-care-compact-grid .detail-tags span { padding: 6px 8px; font-size: 9px; }
+.m10-care-details { margin-top: 15px; padding-top: 5px; border-top: 1px solid var(--m9-line); }
+
+/* Basic child data moved out of the long overview and into an on-demand modal. */
+.m10-info-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  padding: 20px;
+  display: grid;
+  place-items: center;
+  background: rgba(25, 23, 46, .38);
+  backdrop-filter: blur(4px);
+}
+.m10-info-modal-card {
+  width: min(620px, 100%);
+  max-height: min(82vh, 720px);
+  overflow: auto;
+  padding: 22px;
+  border: 1px solid var(--m9-line);
+  border-radius: 24px;
+  background: var(--m9-surface);
+  box-shadow: 0 28px 80px rgba(25, 23, 46, .22);
+}
+.m10-info-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 15px; }
+.m10-info-modal-head h2 { margin: 5px 0 0; color: var(--m9-ink); font-size: 23px; }
+.m10-info-modal-head > button { width: 40px; height: 40px; border: 1px solid var(--m9-line); border-radius: 12px; background: var(--m9-surface-muted); color: var(--m9-ink); font-size: 22px; cursor: pointer; }
+.m10-info-list { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.m10-info-list > div { padding: 13px; border: 1px solid var(--m9-line); border-radius: 14px; background: var(--m9-surface-muted); }
+.m10-info-list dt { margin-bottom: 5px; color: var(--m9-muted); font-size: 9px; }
+.m10-info-list dd { margin: 0; color: var(--m9-ink); font-size: 12px; font-weight: 900; }
+.m10-info-modal-card .m9-child-summary { margin-top: 11px; }
+.m10-info-modal-actions { margin-top: 15px; display: flex; justify-content: flex-start; }
+
+@media (max-width: 1180px) {
+  .m10-child-services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .m10-care-compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 980px) {
+  .m10-files-heading { align-items: flex-start; flex-direction: column; }
+  .m10-child-services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .m10-topbar-leading { flex: 0 0 auto; }
+  .m9-topbar-title { margin-left: 0; margin-right: auto; }
+}
+
+@media (max-width: 720px) {
+  .m10-context-back { min-height: 40px; padding: 0 11px; font-size: 11px; }
+  
+  .m10-files-heading { padding: 3px; }
+  .m10-files-heading h1 { font-size: 29px; }
+  .m10-files-heading .btn { width: 100%; }
+  .m10-child-file-card { min-height: 0; padding: 16px; grid-template-columns: 58px minmax(0, 1fr) 38px; gap: 12px; border-radius: 20px; }
+  .m10-child-file-avatar { width: 58px; height: 58px; border-radius: 18px; font-size: 22px; }
+  .m10-child-file-copy h2 { margin: 3px 0 6px; font-size: 19px; }
+  .m10-child-file-meta { display: grid; gap: 3px; font-size: 9.5px; }
+  .m10-child-file-chevron { width: 36px; height: 36px; border-radius: 11px; }
+  .m10-child-page-heading .m9-child-heading-actions { grid-template-columns: 1fr 1fr; }
+  .m10-child-profile-hero { padding: 16px; gap: 15px; }
+  .m10-profile-info-button { width: 100%; min-width: 0; }
+  .m10-child-services-section { padding: 15px; border-radius: 20px; }
+  .m10-child-services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .m10-service-card { min-height: 128px; padding: 13px; border-radius: 16px; gap: 12px; }
+  .m10-service-icon { width: 39px; height: 39px; }
+  .m10-service-card strong { font-size: 13px; }
+  .m10-service-card small { font-size: 9px; }
+  .m10-care-compact-grid { grid-template-columns: 1fr; }
+  .m10-info-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 460px) {
+  .m10-topbar-leading { gap: 5px; }
+  .m10-context-back { padding: 0 9px; }
+  .m10-child-page-heading .m9-child-heading-actions { grid-template-columns: 1fr; }
+  .m10-child-profile-hero .m9-child-profile-identity { width: 100%; }
+  .m10-child-services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .m10-service-card { min-height: 120px; }
+  .m10-info-modal { padding: 10px; }
+  .m10-info-modal-card { padding: 17px; border-radius: 20px; }
+}
+
+/* Back action follows the Arabic header flow: right side of the content area, while the sticky header stays visible. */
+.m10-topbar-leading { justify-content: flex-start; }
+.m10-context-back {
+  position: static;
+  z-index: auto;
+}
+.m9-topbar.m10-has-context-back .m9-topbar-actions { margin-left: 0; }
+
+@media (max-width: 980px) {
+  .m9-topbar.m10-has-context-back .m9-topbar-actions { margin-left: 0; }
+}
+
+@media (max-width: 460px) {
+  .m9-topbar.m10-has-context-back .m9-topbar-actions { margin-left: 0; }
+}
+
+/* M11 — consistent app header, visible sidebar footer, and compact care overview. */
+.m9-sidebar {
+  overflow: hidden;
+}
+.m9-side-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: start;
+  padding-inline-end: 2px;
+  scrollbar-width: thin;
+}
+.m9-sidebar-spacer { display: none; }
+.m9-sidebar-footer {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 10px;
+}
+.m9-signout-button {
+  width: 100%;
+  justify-content: center;
+}
+
+/* The sidebar already owns the Weam logo, so page headers only show the page title. */
+.m9-topbar {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) auto minmax(170px, 1fr);
+  align-items: center;
+  justify-content: initial;
+  gap: 18px;
+}
+.m10-topbar-leading {
+  justify-self: start;
+  min-width: 0;
+}
+.m9-topbar-title {
+  justify-self: center;
+  margin: 0 !important;
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+}
+.m9-topbar-title strong {
+  display: block;
+  font-size: 20px;
+  line-height: 1.25;
+}
+.m9-topbar-actions {
+  justify-self: end;
+}
+
+/* One back action only: the sticky header button. */
+
+/* Current care: detailed enough to understand, compact enough to scan. */
+.m10-care-summary-card { padding: 22px; }
+.m10-care-heading {
+  margin-bottom: 16px;
+  align-items: center;
+}
+.m10-care-heading h2 { margin-top: 0; }
+.m10-care-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+}
+.m10-care-overview-item {
+  min-height: 122px;
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid var(--m9-line);
+  border-radius: 16px;
+  background: var(--m9-surface-muted);
+}
+.m10-care-overview-title {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+}
+.m10-care-overview-title > span {
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 999px;
+  background: var(--m9-primary);
+}
+.m10-care-overview-title > div { min-width: 0; }
+.m10-care-overview-title strong {
+  display: block;
+  color: var(--m9-ink);
+  font-size: 12px;
+}
+.m10-care-overview-title small {
+  display: block;
+  margin-top: 4px;
+  color: var(--m9-muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+.m10-care-overview-item .detail-tags { gap: 6px; }
+.m10-care-overview-item .detail-tags span {
+  padding: 6px 9px;
+  font-size: 9px;
+}
+.m10-care-overview-item.mint .m10-care-overview-title > span { background: var(--m9-teal); }
+.m10-care-overview-item.pink .m10-care-overview-title > span { background: #cf7b98; }
+.m10-care-overview-item.gold .m10-care-overview-title > span { background: var(--m9-gold); }
+.m10-care-overview-item.violet .m10-care-overview-title > span { background: var(--m9-violet); }
+
+@media (max-width: 980px) {
+  .m9-topbar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+  .m9-topbar-title {
+    justify-self: center;
+    margin: 0 !important;
+  }
+  .m9-topbar-title strong { font-size: 17px; }
+  .m10-care-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .m9-topbar { padding-inline: 12px; }
+  .m9-topbar-title strong { font-size: 16px; }
+  .m10-care-summary-card { padding: 16px; }
+  .m10-care-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .m10-care-overview-item { min-height: 116px; padding: 12px; }
+}
+
+@media (max-width: 380px) {
+  .m10-care-overview-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 980px) {
+  .m9-mobile-bottom-nav { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+}
+
+
+/* M12 — explicit RTL header placement.
+   Back action is on the RIGHT of the content header; account actions stay on the LEFT. */
+.m9-topbar {
+  position: sticky;
+  top: 0;
+}
+.m9-topbar.m10-has-context-back {
+  position: sticky;
+}
+.m10-topbar-leading {
+  position: absolute;
+  right: clamp(20px, 3vw, 44px);
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  justify-self: auto;
+}
+.m9-topbar-actions {
+  position: absolute;
+  left: clamp(20px, 3vw, 44px);
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.m9-topbar-title {
+  justify-self: center;
+}
+.m10-context-back-label {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+@media (max-width: 980px) {
+  .m10-topbar-leading { right: 17px; }
+  .m9-topbar-actions { left: 17px; }
+}
+@media (max-width: 680px) {
+  .m10-topbar-leading { right: 12px; }
+  .m9-topbar-actions { left: 12px; }
+  .m10-context-back { min-height: 40px; padding: 0 10px; gap: 6px; }
+}
+
+/* M13 — keep every page title mathematically centered in the content header,
+   independent of the back button and account controls widths. */
+.m9-topbar {
+  position: sticky;
+  top: 0;
+}
+.m9-topbar-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 !important;
+  width: max-content;
+  max-width: min(46vw, 560px);
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.m9-topbar-title strong {
+  display: block;
+  text-align: center;
+}
+@media (max-width: 680px) {
+  .m9-topbar-title {
+    max-width: 42vw;
+  }
 }

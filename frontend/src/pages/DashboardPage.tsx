@@ -1,15 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { apiClient } from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { useSettings } from '../contexts/SettingsContext'
 import type { ChildProfile } from '../types'
 
+function displayAge(value?: string | null) {
+  if (!value) return 'العمر غير مضاف'
+  const birthDate = new Date(`${value}T00:00:00`)
+  const today = new Date()
+  let age = today.getFullYear() - birthDate.getFullYear()
+  if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) age--
+  return age <= 0 ? 'أقل من سنة' : `${new Intl.NumberFormat('ar-SA').format(age)} سنوات`
+}
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const { t } = useSettings()
   const [children, setChildren] = useState<ChildProfile[]>([])
-  const [selectedChildId, setSelectedChildId] = useState<string>('')
   const canAccessChildren = user?.role === 'guardian' || user?.role === 'care_provider'
   const [loading, setLoading] = useState(canAccessChildren)
   const [error, setError] = useState('')
@@ -18,15 +26,10 @@ export default function DashboardPage() {
     if (!canAccessChildren) return
     setLoading(true)
     apiClient.get<ChildProfile[]>('/children')
-      .then((response) => {
-        setChildren(response.data)
-        setSelectedChildId((current) => current || response.data[0]?.id || '')
-      })
+      .then((response) => setChildren(response.data))
       .catch(() => setError('تعذر تحميل ملفات الأطفال.'))
       .finally(() => setLoading(false))
   }, [canAccessChildren])
-
-  const selectedChild = useMemo(() => children.find((child) => child.id === selectedChildId) ?? children[0], [children, selectedChildId])
 
   if (user?.role === 'center') return <Navigate to="/provider" replace />
   if (user?.role === 'admin') return <Navigate to="/admin" replace />
@@ -72,9 +75,9 @@ export default function DashboardPage() {
   if (!children.length) {
     return (
       <section className="guardian-dashboard">
-        <div className="soft-dashboard-banner">
-          <div><span className="soft-kicker">مرحبًا {user?.full_name} 💛</span><h1>نبدأ أول رحلة مع وئام</h1><p>أنشئي ملف الطفل، وبعدها نربط فريق الرعاية والتقارير والأهداف.</p></div>
-          <Link className="btn btn-primary" to="/children/new">＋ إضافة طفل</Link>
+        <div className="m10-files-heading">
+          <div><span className="soft-kicker">{t('dashboard.kicker')}</span><h1>ملفات الأطفال</h1><p>ابدئي من ملف الطفل للوصول إلى معلوماته وخدماته ومتابعاته في مكان واحد.</p></div>
+          <Link className="btn btn-primary" to="/children/new">{t('dashboard.addChild')}</Link>
         </div>
         <div className="prototype-empty-card"><span>🌱</span><h2>لا يوجد ملف طفل بعد</h2><p>سنطلب فقط المعلومات الأساسية الآن، ويمكن إكمال الباقي تدريجيًا.</p><Link className="btn btn-primary" to="/children/new">إنشاء ملف طفل</Link></div>
       </section>
@@ -82,64 +85,34 @@ export default function DashboardPage() {
   }
 
   return (
-    <section className="guardian-dashboard">
+    <section className="guardian-dashboard m10-children-dashboard">
       {error && <div className="alert alert-error">{error}</div>}
 
-      <div className="m9-dashboard-heading">
-        <div><span className="soft-kicker">{t('dashboard.kicker')}</span><h1>صباح الخير، {user?.full_name}</h1><p>تابعي رحلة الرعاية، واصلي إلى أهم المهام، واحتفظي بكل تفاصيل الطفل في مكان واحد.</p></div>
-        <Link className="btn btn-primary" to="/children/new">{t('dashboard.addChild')}</Link>
+      <div className="m10-files-heading">
+        <div><span className="soft-kicker">الرئيسية</span><h1>ملفات الأطفال</h1><p>اختاري ملف الطفل الذي تريدين متابعته. لكل طفل مساحة مستقلة تجمع النظرة العامة والخدمات والتحديثات.</p></div>
+        <Link className="btn btn-primary" to="/children/new">＋ إضافة ملف طفل</Link>
       </div>
 
-      {children.length > 1 && (
-        <div className="child-switcher" aria-label="اختيار الطفل">
-          {children.map((child) => <button key={child.id} className={selectedChild?.id === child.id ? 'active' : ''} onClick={() => setSelectedChildId(child.id)}>{child.preferred_name || child.first_name}</button>)}
-          <Link to="/children/new">＋</Link>
-        </div>
-      )}
-
-      {selectedChild && (
-        <>
-          <div className="prototype-child-hero m9-child-hero">
-            <div className="child-hero-copy">
-              <span className="soft-kicker">ملف الرعاية الحالي</span>
-              <h1>{selectedChild.preferred_name || selectedChild.first_name}</h1>
-              <p>{selectedChild.summary || 'كل يوم خطوة جديدة نحو تطوير طفلك وتمكينه.'}</p>
-              <Link className="profile-link" to={`/children/${selectedChild.id}`}>عرض الملف الشخصي ←</Link>
-            </div>
-            <Link className="m9-child-identity" to={`/children/${selectedChild.id}`}>
-              <span className="m9-child-avatar">{selectedChild.first_name.slice(0, 1)}</span>
-              <div><small>ملف الطفل</small><strong>{selectedChild.preferred_name || selectedChild.first_name}</strong><span>{selectedChild.services[0] || selectedChild.needs[0] || 'رحلة رعاية متكاملة'}</span></div>
+      <div className="m10-child-file-grid" aria-label="ملفات الأطفال">
+        {children.map((child) => {
+          const displayName = child.preferred_name || child.first_name
+          return (
+            <Link key={child.id} to={`/children/${child.id}`} className="m10-child-file-card" aria-label={`فتح ملف ${displayName}`}>
+              <span className="m10-child-file-avatar">{child.first_name.slice(0, 1)}</span>
+              <div className="m10-child-file-copy">
+                <span className="m10-child-file-label">ملف الطفل</span>
+                <h2>{displayName}</h2>
+                <div className="m10-child-file-meta">
+                  <span>{displayAge(child.birth_date)}</span>
+                  <span>{child.services.length ? `${new Intl.NumberFormat('ar-SA').format(child.services.length)} خدمات حالية` : 'لا توجد خدمات مضافة'}</span>
+                  <span>آخر تحديث {new Date(child.updated_at).toLocaleDateString('ar-SA-u-ca-gregory')}</span>
+                </div>
+              </div>
+              <span className="m10-child-file-chevron" aria-hidden="true">←</span>
             </Link>
-          </div>
-
-          <div className="dashboard-shortcuts">
-            <Link to={`/children/${selectedChild.id}/reports`} className="dashboard-shortcut-link"><span className="shortcut-icon report">▤</span><strong>{t('dashboard.shortcut.reports')}</strong></Link>
-            <Link to={`/children/${selectedChild.id}/timeline`} className="dashboard-shortcut-link"><span className="shortcut-icon appointment">↻</span><strong>{t('dashboard.shortcut.timeline')}</strong></Link>
-            <Link to={`/children/${selectedChild.id}/goals`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">◎</span><strong>{t('dashboard.shortcut.goals')}</strong></Link>
-            <Link to={`/children/${selectedChild.id}/care-team`} className="dashboard-shortcut-link"><span className="shortcut-icon note">♧</span><strong>{t('dashboard.shortcut.careTeam')}</strong></Link>
-            <Link to={`/children/${selectedChild.id}/center-matches`} className="dashboard-shortcut-link"><span className="shortcut-icon goal">✦</span><strong>{t('dashboard.shortcut.centers')}</strong></Link>
-          </div>
-
-          <div className="quick-glance-card">
-            <div className="card-title-row"><div><span className="soft-kicker">{t('dashboard.quickGlance')}</span><h2>رحلة {selectedChild.preferred_name || selectedChild.first_name} الآن</h2></div><Link to={`/children/${selectedChild.id}`}>{t('dashboard.viewDetails')}</Link></div>
-            <div className="quick-stats">
-              <article><span>{t('dashboard.services')}</span><strong>{selectedChild.services.length}</strong><small>{selectedChild.services[0] || 'أضيفي خدمة أولى'}</small></article>
-              <article><span>{t('dashboard.needs')}</span><strong>{selectedChild.needs.length}</strong><small>{selectedChild.needs[0] || 'غير مضافة بعد'}</small></article>
-              <article><span>{t('dashboard.conditions')}</span><strong>{selectedChild.conditions.length}</strong><small>{selectedChild.conditions[0] || 'غير مصنفة'}</small></article>
-            </div>
-          </div>
-
-          <div className="today-card">
-            <div className="card-title-row"><div><span className="soft-kicker">رحلة الطفل</span><h2>كل التحديثات في خط زمني واحد</h2></div><Link to={`/children/${selectedChild.id}/timeline`}>فتح الخط الزمني</Link></div>
-            <div className="timeline-placeholder">
-              <span className="timeline-icon">✓</span>
-              <div><strong>رحلة الرعاية أصبحت أوضح</strong><p>الملف وفريق الرعاية والتقارير والأهداف والمتابعات تظهر معًا في رحلة واحدة واضحة.</p></div>
-            </div>
-          </div>
-
-          <div className="add-another-row"><Link className="btn btn-white" to="/children/new">＋ إضافة طفل آخر</Link></div>
-        </>
-      )}
+          )
+        })}
+      </div>
     </section>
   )
 }

@@ -282,9 +282,6 @@ export default function CareTeamPage() {
             أي وقت.
           </p>
         </div>
-        <Link className="btn btn-outline" to={`/children/${child.id}`}>
-          العودة إلى ملف الطفل
-        </Link>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}

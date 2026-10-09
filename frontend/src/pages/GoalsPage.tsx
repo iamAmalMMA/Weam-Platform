@@ -157,9 +157,6 @@ export default function GoalsPage() {
     <section className="m1-feature-page">
       <div className="m1-feature-hero goals-hero">
         <div>
-          <div className="m1-breadcrumb-row">
-            <Link className="m1-back-link" to={`/children/${child.id}`}>← العودة لملف الطفل</Link>
-          </div>
           <span className="soft-kicker m1-feature-kicker">الأهداف المشتركة</span>
           <h1>أهداف {child.preferred_name || child.first_name}</h1>
           <p>كل هدف له مسؤول واضح، تاريخ مستهدف، تقدم محفوظ، وتحديثات مرتبطة باسم صاحبها وتاريخها.</p>
